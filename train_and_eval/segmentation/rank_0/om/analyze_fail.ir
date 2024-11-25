@@ -1,0 +1,564 @@
+# ===============================================================================================
+# The following shows the last analyze fail log message.
+# ===============================================================================================
+
+----------------------------------------------------
+- Caught exception:
+----------------------------------------------------
+For primitive[Concat] only support one axis different, bug got more than one(shapes is [const vector]{[const vector]{1, 128, 144, 144}, [const vector]{1, 128, 143, 143}})!
+
+----------------------------------------------------
+- C++ Call Stack: (For framework developers)
+----------------------------------------------------
+mindspore\ops\infer\ops_func_impl\concat.cc:77 mindspore::ops::`anonymous-namespace'::CheckShapesValid
+
+----------------------------------------------------
+- The Traceback of Net Construct Code:
+----------------------------------------------------
+# 0 In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:121, 14~40
+        x21 = self.up_concat21(x30, x20)            # channel = filters[2]
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~
+# 1 In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:55~60, 8~41
+        if self.use_deconv:
+# 2 In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:56, 12~47
+            output = self.up_conv(high_feature)
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 3 In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51
+        for feature in low_feature:
+# 4 In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:62, 21~51
+            output = self.concat((output, feature))
+                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ===============================================================================================
+# The following shows the IR when the function graphs evaluation fails to help locate the problem.
+# You can search the last ------------------------> to the node which is evaluated failure.
+# Refer to https://www.mindspore.cn/search?inputValue=analyze_fail.ir to get more instructions.
+# ===============================================================================================
+
+# IR entry: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11
+# Total subgraphs: 0
+
+# Attrs:
+training: 0
+
+# Total params: 52
+# Params:
+%para1_inputs: <null>
+%para2_conv00.convs.0.0.weight: <Ref[Tensor[Float32]], (32, 3, 3, 3), ref_key=conv00.convs.0.0.weight>  :  has_default
+%para3_conv00.convs.0.1.gamma: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.0.1.gamma>  :  has_default
+%para4_conv00.convs.0.1.beta: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.0.1.beta>  :  has_default
+%para5_conv00.convs.0.1.moving_mean: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.0.1.moving_mean>  :  has_default
+%para6_conv00.convs.0.1.moving_variance: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.0.1.moving_variance>  :  has_default
+%para7_conv00.convs.1.0.weight: <Ref[Tensor[Float32]], (32, 32, 3, 3), ref_key=conv00.convs.1.0.weight>  :  has_default
+%para8_conv00.convs.1.1.gamma: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.1.1.gamma>  :  has_default
+%para9_conv00.convs.1.1.beta: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.1.1.beta>  :  has_default
+%para10_conv00.convs.1.1.moving_mean: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.1.1.moving_mean>  :  has_default
+%para11_conv00.convs.1.1.moving_variance: <Ref[Tensor[Float32]], (32), ref_key=conv00.convs.1.1.moving_variance>  :  has_default
+%para12_conv10.convs.0.0.weight: <Ref[Tensor[Float32]], (64, 32, 3, 3), ref_key=conv10.convs.0.0.weight>  :  has_default
+%para13_conv10.convs.0.1.gamma: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.0.1.gamma>  :  has_default
+%para14_conv10.convs.0.1.beta: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.0.1.beta>  :  has_default
+%para15_conv10.convs.0.1.moving_mean: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.0.1.moving_mean>  :  has_default
+%para16_conv10.convs.0.1.moving_variance: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.0.1.moving_variance>  :  has_default
+%para17_conv10.convs.1.0.weight: <Ref[Tensor[Float32]], (64, 64, 3, 3), ref_key=conv10.convs.1.0.weight>  :  has_default
+%para18_conv10.convs.1.1.gamma: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.1.1.gamma>  :  has_default
+%para19_conv10.convs.1.1.beta: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.1.1.beta>  :  has_default
+%para20_conv10.convs.1.1.moving_mean: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.1.1.moving_mean>  :  has_default
+%para21_conv10.convs.1.1.moving_variance: <Ref[Tensor[Float32]], (64), ref_key=conv10.convs.1.1.moving_variance>  :  has_default
+%para22_conv20.convs.0.0.weight: <Ref[Tensor[Float32]], (128, 64, 3, 3), ref_key=conv20.convs.0.0.weight>  :  has_default
+%para23_conv20.convs.0.1.gamma: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.0.1.gamma>  :  has_default
+%para24_conv20.convs.0.1.beta: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.0.1.beta>  :  has_default
+%para25_conv20.convs.0.1.moving_mean: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.0.1.moving_mean>  :  has_default
+%para26_conv20.convs.0.1.moving_variance: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.0.1.moving_variance>  :  has_default
+%para27_conv20.convs.1.0.weight: <Ref[Tensor[Float32]], (128, 128, 3, 3), ref_key=conv20.convs.1.0.weight>  :  has_default
+%para28_conv20.convs.1.1.gamma: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.1.1.gamma>  :  has_default
+%para29_conv20.convs.1.1.beta: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.1.1.beta>  :  has_default
+%para30_conv20.convs.1.1.moving_mean: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.1.1.moving_mean>  :  has_default
+%para31_conv20.convs.1.1.moving_variance: <Ref[Tensor[Float32]], (128), ref_key=conv20.convs.1.1.moving_variance>  :  has_default
+%para32_up_concat11.up_conv.weight: <Ref[Tensor[Float32]], (128, 64, 2, 2), ref_key=up_concat11.up_conv.weight>  :  has_default
+%para33_up_concat11.conv.convs.0.0.weight: <Ref[Tensor[Float32]], (64, 128, 3, 3), ref_key=up_concat11.conv.convs.0.0.weight>  :  has_default
+%para34_up_concat11.conv.convs.1.0.weight: <Ref[Tensor[Float32]], (64, 64, 3, 3), ref_key=up_concat11.conv.convs.1.0.weight>  :  has_default
+%para35_up_concat01.up_conv.weight: <Ref[Tensor[Float32]], (64, 32, 2, 2), ref_key=up_concat01.up_conv.weight>  :  has_default
+%para36_up_concat01.conv.convs.0.0.weight: <Ref[Tensor[Float32]], (32, 64, 3, 3), ref_key=up_concat01.conv.convs.0.0.weight>  :  has_default
+%para37_up_concat01.conv.convs.1.0.weight: <Ref[Tensor[Float32]], (32, 32, 3, 3), ref_key=up_concat01.conv.convs.1.0.weight>  :  has_default
+%para38_up_concat02.up_conv.weight: <Ref[Tensor[Float32]], (64, 32, 2, 2), ref_key=up_concat02.up_conv.weight>  :  has_default
+%para39_up_concat02.conv.convs.0.0.weight: <Ref[Tensor[Float32]], (32, 96, 3, 3), ref_key=up_concat02.conv.convs.0.0.weight>  :  has_default
+%para40_up_concat02.conv.convs.1.0.weight: <Ref[Tensor[Float32]], (32, 32, 3, 3), ref_key=up_concat02.conv.convs.1.0.weight>  :  has_default
+%para41_final2.weight: <Ref[Tensor[Float32]], (2, 32, 1, 1), ref_key=final2.weight>  :  has_default
+%para42_conv30.convs.0.0.weight: <Ref[Tensor[Float32]], (256, 128, 3, 3), ref_key=conv30.convs.0.0.weight>  :  has_default
+%para43_conv30.convs.0.1.gamma: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.0.1.gamma>  :  has_default
+%para44_conv30.convs.0.1.beta: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.0.1.beta>  :  has_default
+%para45_conv30.convs.0.1.moving_mean: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.0.1.moving_mean>  :  has_default
+%para46_conv30.convs.0.1.moving_variance: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.0.1.moving_variance>  :  has_default
+%para47_conv30.convs.1.0.weight: <Ref[Tensor[Float32]], (256, 256, 3, 3), ref_key=conv30.convs.1.0.weight>  :  has_default
+%para48_conv30.convs.1.1.gamma: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.1.1.gamma>  :  has_default
+%para49_conv30.convs.1.1.beta: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.1.1.beta>  :  has_default
+%para50_conv30.convs.1.1.moving_mean: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.1.1.moving_mean>  :  has_default
+%para51_conv30.convs.1.1.moving_variance: <Ref[Tensor[Float32]], (256), ref_key=conv30.convs.1.1.moving_variance>  :  has_default
+%para52_up_concat21.up_conv.weight: <Ref[Tensor[Float32]], (256, 128, 2, 2), ref_key=up_concat21.up_conv.weight>  :  has_default
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11 : 0000024710F5EB50
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:112~141, 4~21/    def construct(self, inputs):/
+subgraph @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11() {
+  %0(CNode_18) = resolve(NameSpace[Entry: 'src.deep_learning.networks.unet_plus_plus.NestedUNet.construct'], src.deep_learning.networks.unet_plus_plus.NestedUNet.construct)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+
+#------------------------> 0
+  %1(CNode_19) = %0(%para1_inputs)
+      : (<Tensor[Float32], (1, 3, 572, 572)>) -> (<null>)
+      #scope: (Default)
+  Return(%1)
+      : (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:138~140, 8~24/        if self.use_ds:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_18{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> Entry: 'src.deep_learning.networks.unet_plus_plus.NestedUNet.construct', [2]: ValueNode<Symbol> src.deep_learning.networks.unet_plus_plus.NestedUNet.construct}
+#   2: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_19{[0]: CNode_18, [1]: param_inputs}
+#   3: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_20{[0]: ValueNode<Primitive> Return, [1]: CNode_19}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11 : 0000024710F61240
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:112~141, 4~21/    def construct(self, inputs):/
+subgraph @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11(%para0_inputs) {
+  %0(CNode_21) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], final2)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:134, 17~28/        final2 = self.final2(x02)/
+  %1(CNode_22) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat02)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:124, 14~30/        x02 = self.up_concat02(x11, x00, x01)       # channel = filters[0]/
+  %2(CNode_23) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat11)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:120, 14~30/        x11 = self.up_concat11(x20, x10)            # channel = filters[1]/
+  %3(CNode_24) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], conv20)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:115, 14~25/        x20 = self.conv20(self.maxpool(x10))        # channel = filters[2]/
+  %4(CNode_25) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], maxpool)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:115, 26~38/        x20 = self.conv20(self.maxpool(x10))        # channel = filters[2]/
+  %5(CNode_26) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], conv10)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:114, 14~25/        x10 = self.conv10(self.maxpool(x00))        # channel = filters[1]/
+  %6(CNode_27) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], maxpool)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:114, 26~38/        x10 = self.conv10(self.maxpool(x00))        # channel = filters[1]/
+  %7(CNode_28) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], conv00)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:113, 14~25/        x00 = self.conv00(inputs)                   # channel = filters[0]/
+  %8(x00) = %7(%para0_inputs)
+      : (<Tensor[Float32], (1, 3, 572, 572)>) -> (<Tensor[Float32], (1, 32, 572, 572)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:113, 14~33/        x00 = self.conv00(inputs)                   # channel = filters[0]/
+  %9(CNode_29) = %6(%8)
+      : (<Tensor[Float32], (1, 32, 572, 572)>) -> (<Tensor[Float32], (1, 32, 286, 286)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:114, 26~43/        x10 = self.conv10(self.maxpool(x00))        # channel = filters[1]/
+  %10(x10) = %5(%9)
+      : (<Tensor[Float32], (1, 32, 286, 286)>) -> (<Tensor[Float32], (1, 64, 286, 286)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:114, 14~44/        x10 = self.conv10(self.maxpool(x00))        # channel = filters[1]/
+  %11(CNode_30) = %4(%10)
+      : (<Tensor[Float32], (1, 64, 286, 286)>) -> (<Tensor[Float32], (1, 64, 143, 143)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:115, 26~43/        x20 = self.conv20(self.maxpool(x10))        # channel = filters[2]/
+  %12(x20) = %3(%11)
+      : (<Tensor[Float32], (1, 64, 143, 143)>) -> (<Tensor[Float32], (1, 128, 143, 143)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:115, 14~44/        x20 = self.conv20(self.maxpool(x10))        # channel = filters[2]/
+  %13(x11) = %2(%12, %10)
+      : (<Tensor[Float32], (1, 128, 143, 143)>, <Tensor[Float32], (1, 64, 286, 286)>) -> (<Tensor[Float32], (1, 64, 286, 286)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:120, 14~40/        x11 = self.up_concat11(x20, x10)            # channel = filters[1]/
+  %14(CNode_31) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat01)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:119, 14~30/        x01 = self.up_concat01(x10, x00)            # channel = filters[0]/
+  %15(x01) = %14(%10, %8)
+      : (<Tensor[Float32], (1, 64, 286, 286)>, <Tensor[Float32], (1, 32, 572, 572)>) -> (<Tensor[Float32], (1, 32, 572, 572)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:119, 14~40/        x01 = self.up_concat01(x10, x00)            # channel = filters[0]/
+  %16(x02) = %1(%13, %8, %15)
+      : (<Tensor[Float32], (1, 64, 286, 286)>, <Tensor[Float32], (1, 32, 572, 572)>, <Tensor[Float32], (1, 32, 572, 572)>) -> (<Tensor[Float32], (1, 32, 572, 572)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:124, 14~45/        x02 = self.up_concat02(x11, x00, x01)       # channel = filters[0]/
+  %17(final2) = %0(%16)
+      : (<Tensor[Float32], (1, 32, 572, 572)>) -> (<Tensor[Float32], (1, 2, 572, 572)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:134, 17~33/        final2 = self.final2(x02)/
+  %18(CNode_32) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], final3)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:135, 17~28/        final3 = self.final3(x03)/
+  %19(CNode_33) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat03)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:128, 14~30/        x03 = self.up_concat03(x12, x00, x01, x02)  # channel = filters[0]/
+  %20(CNode_34) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat12)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:125, 14~30/        x12 = self.up_concat12(x21, x10, x11)       # channel = filters[1]/
+  %21(CNode_35) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], up_concat21)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:121, 14~30/        x21 = self.up_concat21(x30, x20)            # channel = filters[2]/
+  %22(CNode_36) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], conv30)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:116, 14~25/        x30 = self.conv30(self.maxpool(x20))        # channel = filters[3]/
+  %23(CNode_37) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], maxpool)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:116, 26~38/        x30 = self.conv30(self.maxpool(x20))        # channel = filters[3]/
+  %24(CNode_38) = %23(%12)
+      : (<Tensor[Float32], (1, 128, 143, 143)>) -> (<Tensor[Float32], (1, 128, 72, 72)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:116, 26~43/        x30 = self.conv30(self.maxpool(x20))        # channel = filters[3]/
+  %25(x30) = %22(%24)
+      : (<Tensor[Float32], (1, 128, 72, 72)>) -> (<Tensor[Float32], (1, 256, 72, 72)>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:116, 14~44/        x30 = self.conv30(self.maxpool(x20))        # channel = filters[3]/
+
+#------------------------> 1
+  %26(x21) = %21(%25, %12)
+      : (<Tensor[Float32], (1, 256, 72, 72)>, <Tensor[Float32], (1, 128, 143, 143)>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:121, 14~40/        x21 = self.up_concat21(x30, x20)            # channel = filters[2]/
+  %27(x12) = %20(%26, %10, %13)
+      : (<null>, <Tensor[Float32], (1, 64, 286, 286)>, <Tensor[Float32], (1, 64, 286, 286)>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:125, 14~45/        x12 = self.up_concat12(x21, x10, x11)       # channel = filters[1]/
+  %28(x03) = %19(%27, %8, %15, %16)
+      : (<null>, <Tensor[Float32], (1, 32, 572, 572)>, <Tensor[Float32], (1, 32, 572, 572)>, <Tensor[Float32], (1, 32, 572, 572)>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:128, 14~50/        x03 = self.up_concat03(x12, x00, x01, x02)  # channel = filters[0]/
+  %29(final3) = %18(%28)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:135, 17~33/        final3 = self.final3(x03)/
+  %30(CNode_39) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>'], final1)
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:133, 17~28/        final1 = self.final1(x01)/
+  %31(final1) = %30(%15)
+      : (<Tensor[Float32], (1, 32, 572, 572)>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:133, 17~33/        final1 = self.final1(x01)/
+  %32(CNode_40) = MakeTuple(%17, %29, %31)
+      : (<Tensor[Float32], (1, 2, 572, 572)>, <null>, <null>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:112~141, 4~21/    def construct(self, inputs):/
+  %33(CNode_41) = StopGradient(%32)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:112~141, 4~21/    def construct(self, inputs):/
+  %34(CNode_42) = call @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_43()
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:138~140, 8~24/        if self.use_ds:/
+  %35(CNode_44) = Depend(%34, %33) primitive_attrs: {side_effect_propagate: I64(1)} cnode_attrs: {topo_sort_rhs_first: Bool(1)}
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:138~140, 8~24/        if self.use_ds:/
+  Return(%35)
+      : (<null>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:138~140, 8~24/        if self.use_ds:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_28{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> conv00}
+#   2: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_45{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   4: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x00{[0]: CNode_28, [1]: param_inputs}
+#   5: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_26{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> conv10}
+#   6: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_27{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> maxpool}
+#   7: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_46{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   9: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_29{[0]: CNode_27, [1]: x00}
+#  10: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_47{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  12: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x10{[0]: CNode_26, [1]: CNode_29}
+#  13: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_24{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> conv20}
+#  14: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_25{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> maxpool}
+#  15: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_48{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  17: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_30{[0]: CNode_25, [1]: x10}
+#  18: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_49{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  20: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x20{[0]: CNode_24, [1]: CNode_30}
+#  21: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_36{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> conv30}
+#  22: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_37{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> maxpool}
+#  23: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_50{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  25: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_38{[0]: CNode_37, [1]: x20}
+#  26: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_51{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  28: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x30{[0]: CNode_36, [1]: CNode_38}
+#  29: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_52{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> conv40}
+#  30: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_53{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> maxpool}
+#  31: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_54{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  33: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_55{[0]: CNode_53, [1]: x30}
+#  34: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_56{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  36: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x40{[0]: CNode_52, [1]: CNode_55}
+#  37: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_31{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat01}
+#  38: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_57{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  40: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x01{[0]: CNode_31, [1]: x10, [2]: x00}
+#  41: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_23{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat11}
+#  42: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_58{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  44: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x11{[0]: CNode_23, [1]: x20, [2]: x10}
+#  45: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_35{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat21}
+#  46: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_59{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  48: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x21{[0]: CNode_35, [1]: x30, [2]: x20}
+#  49: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_60{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat31}
+#  50: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_61{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  52: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x31{[0]: CNode_60, [1]: x40, [2]: x30}
+#  53: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_22{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat02}
+#  54: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_62{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  56: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x02{[0]: CNode_22, [1]: x11, [2]: x00, [3]: x01}
+#  57: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_34{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat12}
+#  58: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_63{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  60: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x12{[0]: CNode_34, [1]: x21, [2]: x10, [3]: x11}
+#  61: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_64{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat22}
+#  62: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_65{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  64: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x22{[0]: CNode_64, [1]: x31, [2]: x20, [3]: x21}
+#  65: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_33{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat03}
+#  66: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_66{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  68: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x03{[0]: CNode_33, [1]: x12, [2]: x00, [3]: x01, [4]: x02}
+#  69: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_67{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat13}
+#  70: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_68{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  72: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x13{[0]: CNode_67, [1]: x22, [2]: x10, [3]: x11, [4]: x12}
+#  73: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_69{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> up_concat04}
+#  74: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_70{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  76: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:x04{[0]: CNode_69, [1]: x13, [2]: x00, [3]: x01, [4]: x02, [5]: x03}
+#  77: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_39{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> final1}
+#  78: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_71{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  80: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:final1{[0]: CNode_39, [1]: x01}
+#  81: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_21{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> final2}
+#  82: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_72{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  84: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:final2{[0]: CNode_21, [1]: x02}
+#  85: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_32{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> final3}
+#  86: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_73{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  88: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:final3{[0]: CNode_32, [1]: x03}
+#  89: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_74{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<NestedUNet::2504279825200>', [2]: ValueNode<Symbol> final4}
+#  90: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_75{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  92: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:final4{[0]: CNode_74, [1]: x04}
+#  93: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_42{[0]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_43}
+#  95: @src_deep_learning_networks_unet_plus_plus_NestedUNet_construct_11:CNode_20{[0]: ValueNode<Primitive> Return, [1]: CNode_44}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12 : 00000247826D7D70
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12(%para0_high_feature, %para0_low_feature0) {
+
+#------------------------> 2
+  %0(CNode_76) = call @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13()
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:55~60, 8~41/        if self.use_deconv:/
+  Return(%0)
+      : (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:55~60, 8~41/        if self.use_deconv:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12:CNode_76{[0]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13}
+#   2: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12:CNode_77{[0]: ValueNode<Primitive> Return, [1]: CNode_76}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13 : 00000247826D7250
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13 parent: [subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12]() {
+
+#------------------------> 3
+  %0(CNode_78) = call @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14()
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:56, 12~47/            output = self.up_conv(high_feature)/
+  Return(%0)
+      : (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:56, 12~47/            output = self.up_conv(high_feature)/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13:CNode_79{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<UnetUp::2504256646176>', [2]: ValueNode<Symbol> up_conv}
+#   2: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_80:CNode_81{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   3: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13:output{[0]: CNode_79, [1]: param_high_feature}
+#   4: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13:CNode_78{[0]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14}
+#   5: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13:CNode_82{[0]: ValueNode<Primitive> Return, [1]: CNode_78}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14 : 00000247826D93B0
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14 parent: [subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_13]() {
+  %0(CNode_79) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<UnetUp::2504256646176>'], up_conv)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:56, 21~33/            output = self.up_conv(high_feature)/
+  %1(output) = %0($(@src_deep_learning_networks_unet_plus_plus_UnetUp_construct_12:para0_high_feature))
+      : (<Tensor[Float32], (1, 256, 72, 72)>) -> (<Tensor[Float32], (1, 128, 144, 144)>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:56, 21~47/            output = self.up_conv(high_feature)/
+
+#------------------------> 4
+  %2(CNode_83) = call @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15(I64(0), %1)
+      : (<Int64, NoShape>, <Tensor[Float32], (1, 128, 144, 144)>) -> (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  Return(%2)
+      : (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_84{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> len}
+#   2: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_85{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> getitem}
+#   3: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_86{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> iter}
+#   4: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_87{[0]: CNode_86, [1]: CNode_88}
+#   5: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_89{[0]: CNode_84, [1]: CNode_87}
+#   6: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_83{[0]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15, [1]: ValueNode<Int64Imm> 0, [2]: output}
+#   7: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14:CNode_90{[0]: ValueNode<Primitive> Return, [1]: CNode_83}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15 : 00000247826D5C10
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15 parent: [subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_14](%para0_@CNode_16, %para0_phi_output) {
+  %0(CNode_84) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], len)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %1(CNode_86) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], iter)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %2(CNode_88) = MakeTuple(%para0_low_feature0)
+      : (<Tensor[Float32], (1, 128, 143, 143)>) -> (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54, 39~50/    def construct(self, high_feature, *low_feature):/
+  %3(CNode_87) = %1(%2)
+      : (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>) -> (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %4(CNode_89) = %0(%3)
+      : (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>) -> (<Int64, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %5(CNode_91) = MultitypeFuncGraph_less{(Number, Number), (String, String), (Tuple, Tuple), (Tensor, Tensor), (Number, Tensor), (Tensor, Number), (List, List)}(%para0_@CNode_16, %4)
+      : (<Int64, NoShape>, <Int64, NoShape>) -> (<Bool, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %6(CNode_92) = Switch(%5, @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17, @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_93)
+      : (<Bool, NoShape>, <Func, NoShape>, <Func, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+
+#------------------------> 5
+  %7(CNode_94) = %6()
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  Return(%7)
+      : (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:CNode_91{[0]: ValueNode<MultitypeFuncGraph> MetaFuncGraph-less.7, [1]: param_@CNode_16, [2]: CNode_89}
+#   2: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:CNode_92{[0]: ValueNode<Primitive> Switch, [1]: CNode_91, [2]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17, [3]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_93}
+#   3: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:CNode_94{[0]: CNode_92}
+#   4: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:CNode_95{[0]: ValueNode<Primitive> Return, [1]: CNode_94}
+
+
+subgraph attr:
+training: 0
+subgraph instance: src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17 : 00000247826D77E0
+# In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17 parent: [subgraph @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15]() {
+  %0(CNode_96) = MultitypeFuncGraph_add{(Number, Number), (String, String), (Tensor, Tuple), (Number, Tensor), (Tensor, Number), (List, Tensor), (Tuple, Tensor), (NoneType, NoneType), (Tensor, List), (List, List), (Tensor, Tensor), (RowTensor, Tensor), (COOTensor, COOTensor), (Tuple, Tuple), (CSRTensor, CSRTensor), (COOTensor, Tensor), (Tensor, COOTensor), (Dictionary, Dictionary)}($(@src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:para0_@CNode_16), I64(1))
+      : (<Int64, NoShape>, <Int64, NoShape>) -> (<Int64, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %1(CNode_97) = StopGradient(%0)
+      : (<Int64, NoShape>) -> (<Int64, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54~63, 4~32/    def construct(self, high_feature, *low_feature):/
+  %2(CNode_98) = resolve(NameSpace[ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<UnetUp::2504256646176>'], concat)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:62, 21~32/            output = self.concat((output, feature))/
+  %3(CNode_99) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], MakeTuple)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:62, 33~50/            output = self.concat((output, feature))/
+  %4(CNode_85) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], getitem)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %5(CNode_86) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], iter)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %6(CNode_88) = MakeTuple(%para0_low_feature0)
+      : (<Tensor[Float32], (1, 128, 143, 143)>) -> (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>)
+      #scope: (Default)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:54, 39~50/    def construct(self, high_feature, *low_feature):/
+  %7(CNode_87) = %5(%6)
+      : (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>) -> (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %8(feature) = %4(%7, $(@src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:para0_@CNode_16))
+      : (<Tuple[Tensor[Float32]], TupleShape((1, 128, 143, 143))>, <Int64, NoShape>) -> (<Tensor[Float32], (1, 128, 143, 143)>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %9(CNode_100) = %3($(@src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15:para0_phi_output), %8)
+      : (<Tensor[Float32], (1, 128, 144, 144)>, <Tensor[Float32], (1, 128, 143, 143)>) -> (<Tuple[Tensor[Float32]*2], TupleShape((1, 128, 144, 144), (1, 128, 143, 143))>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:62, 33~50/            output = self.concat((output, feature))/
+
+#------------------------> 6
+  %10(output) = %2(%9)
+      : (<Tuple[Tensor[Float32]*2], TupleShape((1, 128, 144, 144), (1, 128, 143, 143))>) -> (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:62, 21~51/            output = self.concat((output, feature))/
+  %11(CNode_101) = call @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15(%0, %10)
+      : (<Int64, NoShape>, <null>) -> (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  %12(CNode_102) = Depend(%11, %1) primitive_attrs: {side_effect_propagate: I64(1)} cnode_attrs: {topo_sort_rhs_first: Bool(1)}
+      : (<null>, <Int64, NoShape>) -> (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+  Return(%12)
+      : (<null>)
+      #scope: (Default/up_concat21-UnetUp)
+      # In file D:\昇腾\大创\shangjing_cell_classification\src\deep_learning\networks\unet_plus_plus.py:61~62, 8~51/        for feature in low_feature:/
+}
+# Order:
+#   1: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:feature{[0]: CNode_85, [1]: CNode_87, [2]: param_@CNode_16}
+#   2: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_96{[0]: ValueNode<MultitypeFuncGraph> MetaFuncGraph-add.8, [1]: param_@CNode_16, [2]: ValueNode<Int64Imm> 1}
+#   3: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_98{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:src.deep_learning.networks.unet_plus_plus..<UnetUp::2504256646176>', [2]: ValueNode<Symbol> concat}
+#   4: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_99{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   5: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_100{[0]: CNode_99, [1]: param_phi_output, [2]: feature}
+#   6: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_103:CNode_104{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   7: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:output{[0]: CNode_98, [1]: CNode_100}
+#   8: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_101{[0]: ValueNode<FuncGraph> src_deep_learning_networks_unet_plus_plus_UnetUp_construct_15, [1]: CNode_96, [2]: output}
+#   9: @src_deep_learning_networks_unet_plus_plus_UnetUp_construct_17:CNode_105{[0]: ValueNode<Primitive> Return, [1]: CNode_102}
+
+
+# ===============================================================================================
+# The total of function graphs in evaluation stack: 7/9 (Ignored 2 internal frames).
+# ===============================================================================================
+
+
+# ===============================================================================================
+# The rest function graphs are the following:
+# ===============================================================================================
+No more function graphs.
+

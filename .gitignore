@@ -1,0 +1,11 @@
+checkpoints/
+datasets/
+image_datasets/
+segmentation_checkpoints/
+datasets_as_numpy/
+dataset_as_numpy/
+image_to_show/
+figures/
+mlp_datasets/
+best_mlp_checkpoints/
+flagged/
