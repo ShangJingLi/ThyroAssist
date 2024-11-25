@@ -9,6 +9,7 @@ figures/
 mlp_datasets/
 best_mlp_checkpoints/
 flagged/
+kernel_meta/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
