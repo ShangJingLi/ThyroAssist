@@ -62,7 +62,7 @@ def cells_segmentation(image: np.array):
     g_thresh = segmentation_by_threshold(g, G_LOW, G_HIGH).astype(np.bool)
     r_thresh = segmentation_by_threshold(r, R_LOW, R_HIGH).astype(np.bool)
 
-    thresh = h_thresh & s_thresh & v_thresh # & b_thresh & g_thresh & r_thresh
+    thresh = h_thresh & s_thresh & v_thresh & b_thresh & g_thresh & r_thresh
     thresh = thresh.astype(np.uint8)
     ksize = (3, 3)
     # cv2.MORPH_CROSS 十字型	cv2.MORPH_RECT 矩形	   cv2.MORPH_ELLIPSE 椭圆形
@@ -90,8 +90,12 @@ def get_time(start: time.time, end:time.time):
     return hours + seconds + minutes
 
 
-def name_processor(directory:str, start:int):
-    """对制定目录下的图片文件进行批量改名"""
+def rename_jpg_files(directory:str, start:int):
+    """对目录下的.jpg文件进行批量改名"""
+    # 确保提供的路径是一个目录
+    if not os.path.isdir(directory):
+        print(f"Error: {directory} is not a directory.")
+        return
     # 获取目录下的所有文件和子目录列表
     files = os.listdir(directory)
 
@@ -145,33 +149,9 @@ def draw_counters(image:np.array, thresh:np.array):
                 cv2.drawContours(copied_image, [hull], -1, (0, 255, 0), 2)  # 使用绿色轮廓线
 
 
-def rename_jpg_files(directory):
-    """批量修改一个目录下的图片的名字"""
-    if not os.path.isdir(directory):
-        print(f"Error: {directory} is not a directory.")
-        return
-
-        # 获取目录下所有的JPG文件
-    jpg_files = [f for f in os.listdir(directory) if f.endswith('.jpg')]
-
-    # 对文件名进行排序（如果需要的话，这里默认按字典序排序）
-    jpg_files.sort()
-
-    # 遍历文件列表，重命名文件
-    for index, file_name in enumerate(jpg_files, start=1):
-        # 构建新的文件名
-        new_file_name = f"{index}.jpg"
-        # 构造原文件和新文件的完整路径
-        old_file_path = os.path.join(directory, file_name)
-        new_file_path = os.path.join(directory, new_file_name)
-        # 重命名文件
-        os.rename(old_file_path, new_file_path)
-        print(f"Renamed '{file_name}' to '{new_file_name}'")
-
 
 __all__ = ['segmentation_by_threshold',
            'cells_segmentation',
-           'name_processor',
            'std_cleaner',
            'draw_counters',
            'get_time',

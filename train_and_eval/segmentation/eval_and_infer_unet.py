@@ -137,5 +137,6 @@ def eval_and_infer(infer_graph_mode=False):
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
 
+
 eval_and_infer()
 
