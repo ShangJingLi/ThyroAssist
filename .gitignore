@@ -151,7 +151,6 @@ cmp/
 RuntimeProfiler*
 
 checkpoint-*/
-data*/
 !mindnlp/data/
 !mindnlp/dataset/
 !docs/api/data/
