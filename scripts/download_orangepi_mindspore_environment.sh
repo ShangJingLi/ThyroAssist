@@ -18,7 +18,7 @@ sudo bash -c '
 
 
 
-    rm -rf *  # 这将在cd成功后执行，如果cd失败则不会执行到这里
+    rm -rf *  # 这将在cd成功后执行，如果cd失败则不会执行到这里,防止文件被误删
 
 
 
@@ -38,16 +38,12 @@ sudo bash -c '
 
 
 
-    ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run --install
+    ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run --install -y
 
-    ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run --install
+    ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run --install -y
 
 '
-
-
-
 # 检查sudo命令是否成功执行（即检查整个sudo bash -c命令的退出状态）
-
 if [ $? -ne 0 ]; then
 
     echo "Error: Failed to run commands as root."
@@ -55,12 +51,6 @@ if [ $? -ne 0 ]; then
     exit 1
 
 fi
-conda create --name mindspore python=3.9 -y
-conda activate mindspore
-
-# 使用 vim 打开 .bashrc 并添加自启动mindspore环境命令
-content_to_add='conda activate mindspore'
-vim -c "normal G" -c "o${content_to_add}" -c "wq" ~/.bashrc
 
 # 安装mindspore部分
 python -m pip install -U pip
