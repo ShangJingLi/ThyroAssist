@@ -48,6 +48,8 @@ fi
 # 配置control CPU的数量为4
 sudo npu-smi set -t cpu-num-cfg -i 0 -c 0 -v 0:4:0
 
+# 将CANN安装脚背写进与root共有的目录下
+
 # 配置ip
 sudo nmcli con mod "Wired connection 1" \
 ipv4.addresses "192.168.137.100/24" \
