@@ -16,37 +16,66 @@ sudo bash -c '
 
     }
 
-
-
     rm -rf *  # 这将在cd成功后执行，如果cd失败则不会执行到这里,防止文件被误删
-
-
 
     cd /home/HwHiAiUser/Downloads || {
 
         echo "Error: Failed to change directory to /home/HwHiAiUser/Downloads." >&2
-
         exit 1
 
     }
-
-
-    pip install openi
-    openi model download enter/nodule_segmentation Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run --save_path ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run
-    openi model download enter/nodule_segmentation Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run --save_path ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run
-    pip uninstall openi -y
-
-    chmod +x ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run
-
-    chmod +x ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run
-
-
-
-    ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run --install -y
-
-    ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run --install -y
-
 '
+
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+pip install openi
+openi dopeni model download enter/nodule_segmentation cann-kernels --save_path .
+openi model download enter/nodule_segmentation cann-toolkits --save_path .
+pip uninstall openi -y
+
+sudo bash -c '
+
+    set -e  # 如果任何命令失败，则立即退出脚本
+
+    CANN_DIR="."
+
+    # 查找toolkit和kernels的安装包
+    TOOLKIT_FILE=$(ls "$CANN_DIR"/Ascend-cann-toolkit_*.run 2>/dev/null | sort -V | tail -n 1)
+    KERNELS_FILE=$(ls "$CANN_DIR"/Ascend-cann-kernels_*.run 2>/dev/null | sort -V | tail -n 1)
+
+    # 检查是否找到了安装包
+    if [ -z "$TOOLKIT_FILE" ]; then
+      echo "Error: No CANN toolkit package found in $CANN_DIR"
+      exit 1
+    fi
+
+    if [ -z "$KERNELS_FILE" ]; then
+      echo "Error: No CANN kernels package found in $CANN_DIR"
+      exit 1
+    fi
+
+    # 赋予安装包执行权限
+    chmod +x "$TOOLKIT_FILE"
+    chmod +x "$KERNELS_FILE"
+
+    # 安装toolkit
+    echo "Installing CANN toolkit..."
+    sudo "$TOOLKIT_FILE" --install -y
+    if [ $? -ne 0 ]; then
+      echo "Error: Failed to install CANN toolkit"
+      exit 1
+    fi
+
+    # 安装kernels
+    echo "Installing CANN kernels..."
+    sudo "$KERNELS_FILE" --install -y
+    if [ $? -ne 0 ]; then
+      echo "Error: Failed to install CANN kernels"
+      exit 1
+    fi
+
+    echo "CANN toolkit and kernels have been installed successfully."
+'
+
 # 检查sudo命令是否成功执行（即检查整个sudo bash -c命令的退出状态）
 if [ $? -ne 0 ]; then
 
@@ -70,10 +99,12 @@ pip install \
     -i https://pypi.tuna.tsinghua.edu.cn/simple
 pip install jinja2 absl-py
 
-# 使用多次 echo 命令将多行内容追加到 .bashrc 中
-echo "export GLOG_v=2" >> ~/.bashrc
-echo "LOCAL_ASCEND=/usr/local/Ascend" >> ~/.bashrc
-echo "source ${LOCAL_ASCEND}/ascend-toolkit/set_env.sh" >> ~/.bashrc
+
+{
+  echo "export GLOG_v=2";
+  echo "LOCAL_ASCEND=/usr/local/Ascend";
+  echo "source ${LOCAL_ASCEND}/ascend-toolkit/set_env.sh" ;
+}  >> ~/.bashrc
 
 python -c "import mindspore;mindspore.set_context(device_target='Ascend');mindspore.run_check()"
 
