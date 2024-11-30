@@ -20,4 +20,7 @@ pip install jinja2 absl-py
   echo "source ${LOCAL_ASCEND}/ascend-toolkit/set_env.sh" ;
 }  >> ~/.bashrc
 
+export GLOG_v=2
+LOCAL_ASCEND=/usr/local/Ascend
+source ${LOCAL_ASCEND}/ascend-toolkit/set_env.sh
 python -c "import mindspore;mindspore.set_context(device_target='Ascend');mindspore.run_check()"
