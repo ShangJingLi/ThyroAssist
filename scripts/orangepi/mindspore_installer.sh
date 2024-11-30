@@ -1,4 +1,5 @@
-# 安装mindspore部分
+# 本脚本请用user模式运行
+# 本脚本用于安装mindspore并配置环境变量
 python -m pip install -U pip
 
 pip install sympy
