@@ -4,9 +4,13 @@
 
 # 检查是否以 root 用户运行
 if [ "$(id -u)" -ne 0 ]; then
-  echo "此脚本必须以 sudo bash 运行。"
+  echo "此脚本不允许用user模式运行。"
   exit 1
 fi
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple || {
+  echo "此脚本不允许用sudo bash命令运行,请以sudo bash -i命令运行"
+}
+pip install openi
 set -e  # 如果任何命令失败，则立即退出脚本
 cd /usr/local/Ascend/ascend-toolkit || {
     echo "Error: Failed to change directory to /usr/local/Ascend/ascend-toolkit. No files will be deleted." >&2
@@ -20,8 +24,6 @@ cd /home/HwHiAiUser/Downloads || {
     exit 1
 }
 
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-pip install openi
 cd /home/HwHiAiUser/Downloads || exit
 
 openi model download enter/nodule_segmentation cann-toolkit --save_path .
