@@ -30,17 +30,9 @@ pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install openi
 cd /home/HwHiAiUser/Downloads || exit
 
-python -c "import os; import fnmatch; import openi;prefix_toolkit='Ascend-cann-toolkit'; \
-prefix_kernels='Ascend-cann-kernels'; extension='.run'; \
-found_toolkit = any(f.startswith(prefix_toolkit) and f.endswith(extension) for f in os.listdir('.')); \
-found_kernels = any(f.startswith(prefix_kernels) and f.endswith(extension) for f in os.listdir('.')); \
-if not found_toolkit: openi.download_model(repo_id='enter/nodule_segmentation', model_name='cann-toolkit', save_path='.') \
-if not found_kernels: openi.download_model(repo_id='enter/nodule_segmentation', model_name='cann-kernels', save_path='.') \
-toolkit_path = next((f for f in os.listdir(os.getcwd()) if fnmatch.fnmatch(f, f'{prefix_toolkit}*')), None); \
-kernels_path = next((f for f in os.listdir(os.getcwd()) if fnmatch.fnmatch(f, f'{prefix_kernels}*')), None);" || exit
+
 
 export TOOLKIT_NAME=$(python -c "import os;import fnmatch;prefix_toolkit='Ascend-cann-toolkit'; extension='.run';found_toolkit = any(f.startswith(prefix_toolkit) and f.endswith(extension) for f in os.listdir('.')); toolkit_path = next((f for f in os.listdir(os.getcwd()) if fnmatch.fnmatch(f, 'Ascend-cann-toolkit*')), None); print(toolkit_path)")
-
 export KERNELS_NAME=$(python -c "import os;import fnmatch;prefix_kernels='Ascend-cann-kernels';extension='.run';found_kernels = any(f.startswith(prefix_kernels) and f.endswith(extension) for f in os.listdir('.'));kernels_path = next((f for f in os.listdir(os.getcwd()) if fnmatch.fnmatch(f, 'Ascend-cann-kernels*')), None);print( kernels_path);")
 
 
