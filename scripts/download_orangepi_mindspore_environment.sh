@@ -31,6 +31,10 @@ sudo bash -c '
     }
 
 
+    pip install openi
+    openi model download enter/nodule_segmentation Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run --save_path ./Ascend-cann-kernels-310b_8.0.RC3.alpha003_linux-aarch64.run
+    openi model download enter/nodule_segmentation Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run --save_path ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run
+    pip uninstall openi -y
 
     chmod +x ./Ascend-cann-toolkit_8.0.RC3.alpha003_linux-aarch64.run
 
