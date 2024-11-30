@@ -28,8 +28,50 @@ sudo bash -c '
 
 pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 pip install openi
-openi dopeni model download enter/nodule_segmentation cann-kernels --save_path .
-openi model download enter/nodule_segmentation cann-toolkits --save_path .
+cd /home/HwHiAiUser/Downloads || exit
+
+# 定义要查找的包模式
+kernel_pattern="Ascend-cann-kernels-*.run"
+toolkit_pattern="Ascend-cann-toolkit_*.run"
+
+# 当前目录
+current_directory=$(pwd)
+
+# 查找当前目录中的kernel包
+kernel_files=$(find "$current_directory" -maxdepth 1 -type f -name "$kernel_pattern")
+
+# 查找当前目录中的toolkit包
+toolkit_files=$(find "$current_directory" -maxdepth 1 -type f -name "$toolkit_pattern")
+
+# 检查toolkit包是否存在
+if [ -z "$toolkit_files" ]; then
+    echo "No toolkit package found. Starting download..."
+    openi model download enter/nodule_segmentation cann-toolkit --save_path .
+
+    # 检查下载是否成功（假设下载后的文件名与模式匹配）
+    downloaded_toolkit_files=$(find "$current_directory" -maxdepth 1 -type f -name "$toolkit_pattern")
+    if [ -z "$downloaded_toolkit_files" ]; then
+        echo "Failed to download toolkit package."
+        exit 1
+    else
+        echo "Toolkit package downloaded successfully: $downloaded_toolkit_files"
+    fi
+fi
+
+# 检查kernel包是否存在
+if [ -z "$kernel_files" ]; then
+    echo "No kernel package found. Starting download..."
+    openi model download enter/nodule_segmentation cann-kernels --save_path .
+
+    # 检查下载是否成功（假设下载后的文件名与模式匹配）
+    downloaded_kernel_files=$(find "$current_directory" -maxdepth 1 -type f -name "$kernel_pattern")
+    if [ -z "$downloaded_kernel_files" ]; then
+        echo "Failed to download kernel package."
+        exit 1
+    else
+        echo "Kernel package downloaded successfully: $downloaded_kernel_files"
+    fi
+fi
 pip uninstall openi -y
 
 sudo bash -c '
@@ -75,15 +117,6 @@ sudo bash -c '
 
     echo "CANN toolkit and kernels have been installed successfully."
 '
-
-# 检查sudo命令是否成功执行（即检查整个sudo bash -c命令的退出状态）
-if [ $? -ne 0 ]; then
-
-    echo "Error: Failed to run commands as root."
-
-    exit 1
-
-fi
 
 # 安装mindspore部分
 python -m pip install -U pip
