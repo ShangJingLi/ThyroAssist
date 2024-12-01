@@ -13,7 +13,7 @@ psutil
 astunparse
 safetensors
 openi~=2.0.2.post3
-mindspore~=2.4.0
+mindspore>=2.2.14
 multiprocess~=0.70.17
 requests~=2.32.3
 gradio~=4.44.1

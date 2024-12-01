@@ -1,5 +1,6 @@
 # 本脚本请用user模式运行
 # 本脚本用于安装mindspore并配置环境变量
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 python -m pip install -U pip
 
 pip install sympy
