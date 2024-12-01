@@ -1,17 +1,8 @@
 numpy~=1.26.4
-protobuf
-asttokens
-pillow
-scipy
-decorator
 matplotlib~=3.9.2
 opencv-python~=4.10.0.84
 opencv-contrib-python
 pandas~=2.2.3
-packaging
-psutil
-astunparse
-safetensors
 openi~=2.0.2.post3
 mindspore>=2.2.14
 multiprocess~=0.70.17
