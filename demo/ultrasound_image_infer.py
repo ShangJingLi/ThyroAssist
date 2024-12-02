@@ -76,4 +76,4 @@ iface = gr.Interface(fn=infer_ultrasound_image,
                      outputs=output_data,
                      title = "甲状腺超声结节区域检测器",
                      description = "选择甲状腺超声图像，通过图像分割和轮廓检测确定结节区域。")
-iface.launch(share=True)
+iface.launch()

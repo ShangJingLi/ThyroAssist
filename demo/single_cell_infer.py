@@ -97,4 +97,4 @@ iface = gr.Interface(
     description="通过手动输入特征，使用多层感知机预测单个细胞是否属于癌细胞。"
 )
 
-iface.launch(share=True)
+iface.launch()
