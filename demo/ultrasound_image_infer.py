@@ -67,7 +67,6 @@ def infer_ultrasound_image(image):
     resized_output = cv2.resize(processed_output, dsize=(572, 572))
     contours, hierarchy = cv2.findContours(resized_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     res = cv2.drawContours(copied_image, contours, -1, (100, 255, 0), 1)
-    res = cv2.cvtColor(res, cv2.COLOR_BGR2RGB)
     return res
 
 
