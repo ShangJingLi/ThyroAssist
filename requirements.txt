@@ -10,3 +10,4 @@ requests~=2.32.3
 gradio~=4.44.1
 docutils~=0.21.2
 fonttools~=4.55.0
+pylint==2.17
