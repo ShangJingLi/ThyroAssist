@@ -7,7 +7,7 @@ if [ "$(id -u)" -ne 0 ]; then
   echo "此脚本不允许用user模式运行。"
   exit 1
 fi
-pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple || {
+pip config set global.index-url https://mirrors.huaweicloud.com/repository/pypi/simple || {
   echo "此脚本不允许用sudo bash命令运行,请以sudo bash -i命令运行"
 }
 pip install openi
@@ -34,5 +34,9 @@ export KERNELS_NAME=$(python -c "import os;import fnmatch;prefix_kernels='Ascend
 
 chmod +x ./${TOOLKIT_NAME}
 chmod +x ./${KERNELS_NAME}
-./${TOOLKIT_NAME} --install
-./${KERNELS_NAME} --install
+./${TOOLKIT_NAME} --install --quiet
+if mkdir -p /usr/local/Ascend/ascend-toolkit/latest; then
+  ./${KERNELS_NAME} --install --quiet
+else
+  echo "请确认cann已经安装成功"
+fi
