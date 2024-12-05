@@ -19,7 +19,7 @@ pip install jinja2 absl-py
 {
   echo "export GLOG_v=2";
   echo "LOCAL_ASCEND=/usr/local/Ascend";
-  echo "source ${LOCAL_ASCEND}/ascend-toolkit/set_env.sh" ;
+  echo "source \${LOCAL_ASCEND}/ascend-toolkit/set_env.sh" ;
 }  >> ~/.bashrc
 
 export GLOG_v=2
