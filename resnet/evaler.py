@@ -1,7 +1,6 @@
 # 请在运行trainer后再运行evaler.py
 import os
 import warnings
-
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,11 +8,10 @@ import mindspore
 from mindspore import nn
 from mindspore import Model
 from mindspore import context
-
-from configuration import ResNetConfig
-from dataloader import create_dataset_with_numpy
-from ResNet import resnet50
-from functions import init_group_params
+from resnet.configuration import ResNetConfig
+from resnet.dataloader import create_dataset_with_numpy
+from resnet.ResNet import resnet50
+from resnet.functions import init_group_params
 """Evaluate ResNet"""
 
 

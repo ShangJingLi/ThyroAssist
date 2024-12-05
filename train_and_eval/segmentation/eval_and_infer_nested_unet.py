@@ -7,7 +7,9 @@ import cv2
 import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
-from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_checkpoints, download_and_unzip_segmentation_datasets
+from src.deep_learning.dataloader import (create_segmentation_dataset_at_numpy,
+                                          download_and_unzip_segmentation_checkpoints,
+                                          download_and_unzip_segmentation_datasets)
 from src.deep_learning.networks import NestedUNet
 from src.deep_learning.utils import get_time
 from src.deep_learning.configuration import NestedUNetConfig
@@ -18,7 +20,7 @@ if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
 else:
     try:
-        if subprocess.run(['whoami'], capture_output=True, text=True).stdout.strip() == 'HwHiAiUser':
+        if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
             context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
             USE_ORANGE_PI = True
         else:
@@ -147,6 +149,4 @@ def eval_and_infer(infer_graph_mode=False):
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
 
-
 eval_and_infer()
-

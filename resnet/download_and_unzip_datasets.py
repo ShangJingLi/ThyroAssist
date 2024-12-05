@@ -1,5 +1,3 @@
-import requests
-from pathlib import Path
 import os
 import zipfile
 import openi
@@ -8,7 +6,7 @@ import openi
 # 定义下载函数，包含进度打印
 def download_and_unzip():
     openi.download_file(repo_id="enter/enter202404211533475", file="datasets.zip", cluster="NPU",
-                        save_path=".",
+                        save_path="",
                         force=False)
     zip_file_path = 'datasets.zip'
 
@@ -26,3 +24,6 @@ def download_and_unzip():
         print(f'文件 {zip_file_path} 不存在。')
 
     print('数据集下载和解压已完成')
+
+
+__all__ = ['download_and_unzip']

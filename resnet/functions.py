@@ -1,5 +1,5 @@
 import numpy as np
-from configuration import ResNetConfig
+from resnet.configuration import ResNetConfig
 "Functions"
 
 config = ResNetConfig()
@@ -17,8 +17,7 @@ def _generate_poly_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
         else:
             base = (1.0 - (float(i) - float(warmup_steps)) / (float(total_steps) - float(warmup_steps)))
             lr = float(lr_max) * base * base
-            if lr < 0.0:
-                lr = 0.0
+            lr = max(lr, 0.0)
         lr_each_step.append(lr)
     return lr_each_step
 
@@ -56,3 +55,7 @@ def init_group_params(net):
                     {'order_params': net.trainable_params()}]
 
     return group_params
+
+
+__all__ = ['init_lr',
+           'init_group_params']

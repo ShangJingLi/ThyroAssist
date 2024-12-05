@@ -24,7 +24,7 @@ class MultiClassDatasetAtNumpy:
         self.masks = masks
         self.is_train = is_train
 
-        self.ids = [i for i in range(images.shape[0])]
+        self.ids = list(range(images.shape[0]))
         if shuffle:
             np.random.shuffle(self.ids)  # 打乱排序列表
 

@@ -8,14 +8,12 @@ from mindspore import context
 from mindspore import nn
 from mindspore import Model
 from mindspore.train.callback import LossMonitor, TimeMonitor
-
-from configuration import ResNetConfig
-from dataloader import create_dataset_with_numpy
-from ResNet import resnet50
-from functions import init_lr, init_group_params
-from download_and_unzip_datasets import download_and_unzip
+from resnet.configuration import ResNetConfig
+from resnet.dataloader import create_dataset_with_numpy
+from resnet.ResNet import resnet50
+from resnet.functions import init_lr, init_group_params
+from resnet.download_and_unzip_datasets import download_and_unzip
 """Train ResNet"""
-
 
 mindspore.set_seed(1)
 try:
@@ -31,7 +29,7 @@ except:
 
 
 directory_name = 'datasets'
-directory_path = os.path.join('.', directory_name)
+directory_path = os.path.join('', directory_name)
 
 # 检查路径是否存在且是一个目录
 if os.path.exists(directory_path) and os.path.isdir(directory_path):
@@ -119,5 +117,3 @@ if not os.path.exists(full_path):
 mindspore.save_checkpoint(model.train_network, 'checkpoints/flowers_classification_ckpt')
 print(f"模型参数已成功保存于目录 ./{dir_name} 下")
 print('========================== Training Ended ==========================')
-
-

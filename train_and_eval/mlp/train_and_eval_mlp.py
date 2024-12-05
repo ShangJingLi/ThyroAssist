@@ -37,7 +37,7 @@ if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
 else:
     try:
-        if subprocess.run(['whoami'], capture_output=True, text=True).stdout.strip() == 'HwHiAiUser':
+        if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
             context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
             USE_ORANGE_PI = True
         else:
@@ -87,5 +87,3 @@ def train_and_eval():
 
 
 train_and_eval()
-
-

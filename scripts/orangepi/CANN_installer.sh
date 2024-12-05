@@ -1,3 +1,4 @@
+#!/bin/bash
 # 本脚本必须以root用户模式运行，否则将无法正常安装CANN
 # 本脚本实现以下功能：
 # pip下载openi，并在openi中下载CANN

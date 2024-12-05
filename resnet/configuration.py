@@ -27,3 +27,4 @@ class ResNetConfig:
         self.save_ckeckpoint = True
         self.dataset_sink_mode =  False
 
+__all__ = ['ResNetConfig']

@@ -1,7 +1,3 @@
-import mindspore
-from mindspore import nn
-
-
 class MlpModelConfig:
     """细胞分类多层感知机模型配置"""
     def __init__(self):

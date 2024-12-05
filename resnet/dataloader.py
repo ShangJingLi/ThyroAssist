@@ -11,7 +11,7 @@ class SyntheticData:
         self.labels = labels
         self.is_train = is_train
 
-        self.ids = [i for i in range(images.shape[0])]
+        self.ids = list(range(images.shape[0]))
         if shuffle:
             np.random.shuffle(self.ids)
 
@@ -54,3 +54,7 @@ def create_dataset_with_numpy(images, labels, batch_size, is_train):
                                        num_parallel_workers=get_num_parallel_workers(8))
     datas = dataset_trans.batch(batch_size=batch_size, drop_remainder=True)
     return datas
+
+__all__ = ['get_num_parallel_workers',
+           'create_dataset_with_numpy',
+           'SyntheticData']

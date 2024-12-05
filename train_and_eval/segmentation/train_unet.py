@@ -5,10 +5,9 @@ import numpy as np
 import mindspore
 from mindspore import nn
 from mindspore import Model
-
-from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
-import mindspore.context as context
+from mindspore import context
 from mindspore.train.callback import LossMonitor
+from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
 from src.deep_learning.networks import UNet
 from src.deep_learning.utils import get_time
 from src.deep_learning.configuration import UNetConfig
@@ -45,7 +44,7 @@ if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
 else:
     try:
-        if subprocess.run(['whoami'], capture_output=True, text=True).stdout.strip() == 'HwHiAiUser':
+        if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
             context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
             USE_ORANGE_PI = True
         else:
