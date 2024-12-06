@@ -133,7 +133,6 @@ save/
 .vs
 
 # ms files
-kernel_meta/
 kernel_meta*/
 ge*.json
 
