@@ -67,7 +67,7 @@ class NestedUNet(nn.Cell):
     """
     Nested unet
     """
-    def __init__(self, n_channels=3, n_classes=2, feature_scale=2, use_deconv=True, use_bn=True, use_ds=False):
+    def __init__(self, n_channels=3, n_classes=2, feature_scale=2, use_deconv=True, use_bn=True, use_ds=True):
         super(NestedUNet, self).__init__()
         self.in_channel = n_channels
         self.n_class = n_classes

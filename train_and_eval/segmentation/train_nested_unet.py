@@ -7,7 +7,7 @@ from mindspore import nn
 from mindspore import Model
 from mindspore import context
 from mindspore.train.callback import LossMonitor
-from src.deep_learning import MixedLoss
+from src.deep_learning.loss import MultiCrossEntropyWithLogits
 from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
 from src.deep_learning.networks import NestedUNet
 from src.deep_learning.utils import get_time
@@ -68,7 +68,7 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
                                                          img_size=config.image_size, mask_size=config.mask_size,
                                                          batch_size=batch_size, num_classes=2,
                                                          is_train=True, augment=False)
-    loss_function = MixedLoss()
+    loss_function = MultiCrossEntropyWithLogits()
     optimizer = nn.Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=0.0,
                         loss_scale=config.loss_scale)
 
