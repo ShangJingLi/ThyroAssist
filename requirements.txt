@@ -7,7 +7,7 @@ openi~=2.0.2.post3
 mindspore>=2.2.14
 multiprocess~=0.70.17
 requests~=2.32.3
-gradio~=4.44.1
+gradio
 docutils~=0.21.2
 fonttools~=4.55.0
 pylint==2.17
