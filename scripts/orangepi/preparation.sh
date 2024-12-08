@@ -5,42 +5,24 @@
 # 2.自动创建名为mindspore的conda环境，并配置环境变量在打开终端后自动进入该环境
 # 3.自动配置control CPU的个数为4，AI CPU的数量为0
 # 4.自动配置静态IP为192.168.137.100,子网掩码为255.255.255.0
-SWAPFILE="/swapfile"
+ 
+# 定义要查找的文件路径
+FILE="/swapfile"
+ 
+# 检查文件是否存在
+if [ ! -e "$FILE" ]; then
+    echo "swapfile 不存在，执行某些命令..."
+    
 
-# 检查swap文件是否存在，若不存在，则直接创建
-if [ -e "$SWAPFILE" ]; then
-    echo "Swap file already exists. Skipping swap configuration."
+    sudo fallocate -l 16G /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    sudo chmod 600 /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    
+    echo "swapfile 已创建并配置为swap分区。"
 else
-    # 创建并配置swap文件
-    sudo fallocate -l 16G "$SWAPFILE"
-    if [ $? -ne 0 ]; then
-        echo "Failed to create swap file."
-        exit 1
-    fi
-
-    sudo mkswap "$SWAPFILE"
-    if [ $? -ne 0 ]; then
-        echo "Failed to create swap area on swap file."
-        exit 1
-    fi
-
-    sudo swapon "$SWAPFILE"
-    if [ $? -ne 0 ]; then
-        echo "Failed to enable swap file."
-        exit 1
-    fi
-
-    sudo chmod 600 "$SWAPFILE"
-    if [ $? -ne 0 ]; then
-        echo "Failed to set permissions on swap file."
-        exit 1
-    fi
-
-    echo "'$SWAPFILE none swap sw 0 0' " | sudo tee -a /etc/fstab
-    if [ $? -ne 0 ]; then
-        echo "Failed to add swap file to /etc/fstab."
-        exit 1
-    fi
+    echo "swapfile 已存在。"
 fi
 
 if ! conda env list | grep -q mindspore; then
