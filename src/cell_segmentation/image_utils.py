@@ -1,5 +1,7 @@
 import os
 import time
+import zipfile
+import openi
 import cv2
 import numpy as np
 
@@ -149,10 +151,88 @@ def draw_counters(image:np.array, thresh:np.array):
                 cv2.drawContours(copied_image, [hull], -1, (0, 255, 0), 2)  # 使用绿色轮廓线
 
 
+def download_images():
+    openi.download_file(repo_id="enter/nodule_segmentation", file="image_to_show.zip", cluster="NPU",
+                                save_path=".",
+                                force=False)
+    zip_file_path = 'image_to_show.zip'
+
+    # 检查ZIP文件是否存在
+    if os.path.exists(zip_file_path):
+        # 使用with语句打开ZIP文件，确保文件正确关闭
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            # 解压ZIP文件到当前目录
+            zip_ref.extractall('.')
+
+        # 解压完成后删除ZIP文件
+        os.remove(zip_file_path)
+        print(f'文件 {zip_file_path} 已解压并删除。')
+    else:
+        print(f'文件 {zip_file_path} 不存在。')
+
+    print('病理图片数据下载成功！')
+
+
+def power(image, power_value):
+    copied_image = np.copy(image)
+
+    normalized_image = cv2.normalize(copied_image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    normalized_image = np.power(normalized_image, power_value)
+    copied_image = np.uint8(normalized_image * 255)
+
+    return copied_image
+
+
+def watershed_algorthm(image):
+    b, g, r = cv2.split(image)
+
+    beta = 0.7
+    image_to_process = cv2.addWeighted(b, beta, r, 1-beta, 0)
+    image_gray = power(image_to_process, 0.5)
+
+    # 高斯滤波
+    for i in range(3):
+        image_gray = cv2.GaussianBlur(image_gray, (5, 5), 0)
+
+    # 基于直方图的二值化处理
+    _, thresh = cv2.threshold(image_gray, 200, 255, cv2.THRESH_BINARY_INV)
+    # thresh = cv2.adaptiveThreshold(image_gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 401, 0)
+
+
+    # 做开操作，是为了除去白噪声
+    kernel = np.ones((3, 3), dtype=np.uint8)
+    opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+
+    # 做膨胀操作，是为了让前景漫延到背景，让确定的背景出现
+    sure_bg = cv2.dilate(opening, kernel, iterations=2)
+
+    # 为了求得确定的前景，也就是注水处使用距离的方法转化
+    dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+    # 归一化所求的距离转换，转化范围是[0, 1]
+    ret, sure_fg = cv2.threshold(dist_transform, 0.1 * dist_transform.max(), 255, 0)
+
+    sure_fg = np.uint8(sure_fg)
+    unknow = cv2.subtract(sure_bg, sure_fg)
+
+    ret, markers = cv2.connectedComponents(sure_fg, connectivity=8)
+    markers = markers + 1
+    markers[unknow == 255] = 0
+
+    copy_image = np.copy(image)
+    # 分水岭算法
+    markers = cv2.watershed(copy_image, markers)
+
+    # 分水岭算法得到的边界点的像素值为-1
+    copy_image[markers == -1] = [0, 0, 255]
+
+    return copy_image
+
 
 __all__ = ['segmentation_by_threshold',
            'cells_segmentation',
            'std_cleaner',
            'draw_counters',
            'get_time',
-           'rename_jpg_files']
+           'rename_jpg_files',
+           'download_images',
+           'watershed_algorthm']
