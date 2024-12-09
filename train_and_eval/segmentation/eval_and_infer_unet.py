@@ -41,8 +41,12 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
+    if len(val_images) == 3:
+        n_channels = 1
+    else:
+        n_channels = 3
 
-    net = UNet(n_channels=3, n_classes=2)
+    net = UNet(n_channels=n_channels, n_classes=2)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
     if not os.path.exists(target_directory):
@@ -75,7 +79,10 @@ def eval_and_infer(infer_graph_mode=False):
     if infer_graph_mode:
         start_time = time.time()
 
-        transposed_val_images = np.transpose(val_images, (0, 3, 1, 2))
+        if len(val_images) == 3:
+            transposed_val_images = np.transpose(val_images, (0, 3, 1, 2))
+        else:
+            transposed_val_images = np.expand_dims(val_images, axis=1)
         transposed_val_images = (transposed_val_images.astype(np.float32)) / 127.5 - 1
         inputs = Tensor(transposed_val_images)
 
@@ -118,7 +125,10 @@ def eval_and_infer(infer_graph_mode=False):
             origin_mask = val_masks[i]
 
             infer_data = np.copy(origin_infer_data)
-            infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+            if len(infer_data.shape) == 3:
+                infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+            else:
+                infer_data = np.reshape(infer_data, (1, 1, infer_data.shape[0], infer_data.shape[1]))/ 127.5 - 1
 
             output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
             output_as_numpy = np.argmax(output.asnumpy(), axis=1)
@@ -127,7 +137,7 @@ def eval_and_infer(infer_graph_mode=False):
 
             fig = plt.figure(figsize=(20, 10))
             plt.subplot(131)
-            plt.imshow(origin_infer_data)
+            plt.imshow(origin_infer_data, cmap='gray')
             plt.subplot(132)
             plt.imshow(origin_mask, cmap='gray')
             plt.subplot(133)

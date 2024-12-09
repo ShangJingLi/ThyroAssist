@@ -56,7 +56,7 @@ else:
 def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=config.lr):
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
-    net = UNet(n_channels=3, n_classes=2)
+
     if not os.path.exists('datasets_as_numpy'):
         download_and_unzip_segmentation_datasets()
     else:
@@ -64,10 +64,15 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
 
     train_images = np.load(os.path.join("datasets_as_numpy", "train_images.npy"))
     train_masks = np.load(os.path.join("datasets_as_numpy", "train_masks.npy"))
+    if len(train_images.shape) == 3:
+        n_channels = 1
+    else:
+        n_channels = 3
     train_dataset = create_segmentation_dataset_at_numpy(train_images, train_masks,
                                                          img_size=(572, 572), mask_size=(388, 388),
                                                          batch_size=batch_size, num_classes=2,
                                                          is_train=True, augment=False)
+    net = UNet(n_channels=n_channels, n_classes=2)
     loss_function = nn.DiceLoss()
     optimizer = nn.Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=0.00001,
                         loss_scale=config.loss_scale)

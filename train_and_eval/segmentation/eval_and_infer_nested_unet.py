@@ -41,10 +41,12 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
+    if len(val_images) == 3:
+        n_channels = 1
+    else:
+        n_channels = 3
 
-    print(val_images.shape, type(val_images))
-
-    net = NestedUNet(n_channels=3, n_classes=2)
+    net = NestedUNet(n_channels=n_channels, n_classes=2, is_train=False)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
     if not os.path.exists(target_directory):
@@ -108,7 +110,6 @@ def eval_and_infer(infer_graph_mode=False):
             fig.savefig(os.path.join(target_directory, f"{2*i+1}.jpg"))
 
     else:
-        print(val_images.shape, type(val_images))
         start_time = time.time()
         current_directory = os.getcwd()
         target_directory = os.path.join(current_directory, 'figures')
@@ -118,7 +119,11 @@ def eval_and_infer(infer_graph_mode=False):
             pass
 
         for i in range(10):
-            resized_images = np.zeros((100, 256, 256, 3), dtype=np.uint8)
+            if len(val_images.shape) == 3:
+                resized_shape = (val_images.shape[0], 256, 256)
+            else:
+                resized_shape = (val_images.shape[0], 256, 256, 3)
+            resized_images = np.zeros(shape=resized_shape, dtype=np.uint8)
             # 遍历每个图像并调整大小
             for j in range(val_images.shape[0]):
                 resized_images[j] = cv2.resize(val_images[j], (256, 256), interpolation=cv2.INTER_AREA)
@@ -127,9 +132,11 @@ def eval_and_infer(infer_graph_mode=False):
             origin_mask = val_masks[i]
 
             infer_data = np.copy(origin_infer_data)
-            infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+            if len(infer_data.shape) == 3:
+                infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+            else:
+                infer_data = np.reshape(infer_data, (1, 1, infer_data.shape[0], infer_data.shape[1])) / 127.5 - 1
 
-            print(infer_data.shape, infer_data.dtype)
             output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
             output_as_numpy = np.argmax(output.asnumpy(), axis=1)
             output_as_numpy = output_as_numpy.reshape(256, 256)

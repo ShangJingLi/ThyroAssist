@@ -67,14 +67,14 @@ class NestedUNet(nn.Cell):
     """
     Nested unet
     """
-    def __init__(self, n_channels=3, n_classes=2, feature_scale=2, use_deconv=True, use_bn=True, use_ds=True):
+    def __init__(self,is_train, n_channels=3, n_classes=2, feature_scale=2, use_deconv=True, use_bn=True):
         super(NestedUNet, self).__init__()
         self.in_channel = n_channels
         self.n_class = n_classes
         self.feature_scale = feature_scale
         self.use_deconv = use_deconv
         self.use_bn = use_bn
-        self.use_ds = use_ds
+        self.use_ds = is_train
 
         filters = [64, 128, 256, 512, 1024]
         filters = [int(x / self.feature_scale) for x in filters]

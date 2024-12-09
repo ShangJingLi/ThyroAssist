@@ -120,7 +120,10 @@ def preprocess_img_mask(img, mask, num_classes, img_size=(572, 572),  mask_size=
         img = cv2.resize(img, img_size)  # 调整图像大小
         mask = cv2.resize(mask, mask_size)
     img = (img.astype(np.float32) - 127.5) / 127.5  # 图像像素值转到-1，1
-    img = img.transpose(2, 0, 1)  # 变换维度，将图像变为（通道，高，宽的形式）， 每个通道为1个大矩阵
+    if len(img.shape) == 3:
+        img = img.transpose(2, 0, 1)  # 变换维度，将图像变为（通道，高，宽的形式）， 每个通道为1个大矩阵
+    else:
+        np.expand_dims(img, axis=0)
     if num_classes == 2:
         mask = mask.astype(np.float32) / mask.max()  # 归一化到0-1之间
         mask = (mask > 0.5).astype(np.int32)  # 二值化标签
