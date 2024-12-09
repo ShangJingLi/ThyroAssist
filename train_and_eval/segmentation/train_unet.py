@@ -66,7 +66,7 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
     train_masks = np.load(os.path.join("datasets_as_numpy", "train_masks.npy"))
     train_dataset = create_segmentation_dataset_at_numpy(train_images, train_masks,
                                                          img_size=(572, 572), mask_size=(388, 388),
-                                                         batch_size=batch_size, num_classes=2,
+                                                         batch_size=1, num_classes=2,
                                                          is_train=True, augment=False)
     net = UNet(n_channels=3, n_classes=2)
     loss_function = nn.DiceLoss()
@@ -82,7 +82,7 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
     model.train(epoch, train_dataset, callbacks=[LossMonitor(1)],
                 dataset_sink_mode=False)
     current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
+    target_directory = os.path.join(current_directory, 'unet_checkpoints')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:

@@ -8,12 +8,11 @@ import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
 from src.deep_learning.dataloader import (create_segmentation_dataset_at_numpy,
-                                          download_and_unzip_segmentation_checkpoints,
+                                          download_and_unzip_unet_checkpoints,
                                           download_and_unzip_segmentation_datasets)
 from src.deep_learning.networks import UNet
 from src.deep_learning.utils import get_time
 from src.deep_learning.configuration import UNetConfig
-# python train_and_eval/segmentation/eval_and_infer_unet.py
 
 USE_ORANGE_PI = False
 
@@ -45,9 +44,9 @@ def eval_and_infer(infer_graph_mode=False):
 
     net = UNet(n_channels=3, n_classes=2)
     current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
+    target_directory = os.path.join(current_directory, 'unet_checkpoints')
     if not os.path.exists(target_directory):
-        download_and_unzip_segmentation_checkpoints()
+        download_and_unzip_unet_checkpoints()
     else:
         pass
     ckpt_file = os.path.join(target_directory, 'unet_checkpoints.ckpt')
@@ -125,8 +124,7 @@ def eval_and_infer(infer_graph_mode=False):
             if len(infer_data.shape) == 3:
                 infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
             else:
-                infer_data = np.expand_dims(((cv2.cvtColor(infer_data, cv2.COLOR_GRAY2BGR).astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
-
+                infer_data = np.expand_dims(np.tile(infer_data.astype(np.float32), reps=(3, 1, 1)), axis=0)
 
             output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
             output_as_numpy = np.argmax(output.asnumpy(), axis=1)

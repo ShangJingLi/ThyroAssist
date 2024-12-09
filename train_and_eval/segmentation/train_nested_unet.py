@@ -82,7 +82,7 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
     model.train(epoch, train_dataset, callbacks=[LossMonitor(1)],
                 dataset_sink_mode=False)
     current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
+    target_directory = os.path.join(current_directory, 'nested_unet_checkpoints')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:

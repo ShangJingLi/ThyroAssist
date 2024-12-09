@@ -8,11 +8,12 @@ import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
 from src.deep_learning.dataloader import (create_segmentation_dataset_at_numpy,
-                                          download_and_unzip_segmentation_checkpoints,
+                                          download_and_unzip_nested_unet_checkpoints,
                                           download_and_unzip_segmentation_datasets)
 from src.deep_learning.networks import NestedUNet
 from src.deep_learning.utils import get_time
 from src.deep_learning.configuration import NestedUNetConfig
+import sys
 
 
 USE_ORANGE_PI = False
@@ -44,9 +45,9 @@ def eval_and_infer(infer_graph_mode=False):
 
     net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
     current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
+    target_directory = os.path.join(current_directory, 'nested_unet_checkpoints')
     if not os.path.exists(target_directory):
-        download_and_unzip_segmentation_checkpoints()
+        download_and_unzip_nested_unet_checkpoints()
     else:
         pass
     ckpt_file = os.path.join(target_directory, 'nested_unet_checkpoints.ckpt')
