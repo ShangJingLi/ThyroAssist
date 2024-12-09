@@ -30,8 +30,29 @@ else:
 
 config = UNetConfig()
 
+val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
+val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
 
-def eval_and_infer(infer_graph_mode=False):
+net = UNet(n_channels=3, n_classes=2)
+current_directory = os.getcwd()
+target_directory = os.path.join(current_directory, 'unet_checkpoints')
+if not os.path.exists(target_directory):
+    download_and_unzip_unet_checkpoints()
+else:
+    pass
+ckpt_file = os.path.join(target_directory, 'unet_checkpoints.ckpt')
+params = mindspore.load_checkpoint(ckpt_file)
+mindspore.load_param_into_net(net, params)
+
+optimizer = nn.Adam(params=net.trainable_params(), learning_rate=config.lr, weight_decay=0.00001,
+                        loss_scale=config.loss_scale)
+
+loss_scale_manager = mindspore.train.loss_scale_manager.FixedLossScaleManager(128, False)
+loss_function = nn.DiceLoss()
+model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
+              optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
+
+def eval_unet():
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
     if not os.path.exists('datasets_as_numpy'):
@@ -39,39 +60,21 @@ def eval_and_infer(infer_graph_mode=False):
     else:
         pass
 
-    val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
-    val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-
-    net = UNet(n_channels=3, n_classes=2)
-    current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'unet_checkpoints')
-    if not os.path.exists(target_directory):
-        download_and_unzip_unet_checkpoints()
-    else:
-        pass
-    ckpt_file = os.path.join(target_directory, 'unet_checkpoints.ckpt')
-    params = mindspore.load_checkpoint(ckpt_file)
-    mindspore.load_param_into_net(net, params)
     val_dataset = create_segmentation_dataset_at_numpy(val_images, val_masks,
-                                                       img_size=(572, 572), mask_size=(388, 388),
+                                                       img_size=config.image_size, mask_size=config.mask_size,
                                                        batch_size=config.eval_batch_size, num_classes=2,
                                                        is_train=False, augment=False)
-    loss_function = nn.DiceLoss()
-    optimizer = nn.Adam(params=net.trainable_params(), learning_rate=config.lr, weight_decay=0.00001,
-                        loss_scale=config.loss_scale)
-
-    loss_scale_manager = mindspore.train.loss_scale_manager.FixedLossScaleManager(128, False)
-
-    model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
-                  optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
-
     print("============ Starting Evaluation ============")
     start_time = time.time()
-    dice = model.eval(val_dataset, None, False)
-    print(dice)
+    result = model.eval(val_dataset, None, False)
+    print(result)
     end_time = time.time()
     print("评估时长：", get_time(start_time, end_time))
+    print("============ End Evaluation ============")
 
+
+
+def infer_unet(infer_graph_mode=False):
     if infer_graph_mode:
         start_time = time.time()
 
@@ -141,9 +144,6 @@ def eval_and_infer(infer_graph_mode=False):
             fig.savefig(os.path.join(target_directory, f"{i}.jpg"))
         end_time = time.time()
         print("推理时长：", get_time(start_time, end_time))
-    print("============ End Evaluation ============")
+
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
-
-
-eval_and_infer()
