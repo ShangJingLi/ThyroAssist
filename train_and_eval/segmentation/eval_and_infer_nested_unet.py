@@ -41,12 +41,8 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-    if len(val_images.shape) == 3:
-        n_channels = 1
-    else:
-        n_channels = 3
 
-    net = NestedUNet(n_channels=n_channels, n_classes=2, is_train=False)
+    net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
     if not os.path.exists(target_directory):
@@ -118,16 +114,17 @@ def eval_and_infer(infer_graph_mode=False):
         else:
             pass
 
-        for i in range(10):
-            if len(val_images.shape) == 3:
-                resized_shape = (val_images.shape[0], 256, 256)
-            else:
-                resized_shape = (val_images.shape[0], 256, 256, 3)
-            resized_images = np.zeros(shape=resized_shape, dtype=np.uint8)
-            # 遍历每个图像并调整大小
-            for j in range(val_images.shape[0]):
-                resized_images[j] = cv2.resize(val_images[j], (256, 256), interpolation=cv2.INTER_AREA)
 
+        resized_images = np.zeros(shape=(val_images.shape[0], 256, 256, 3), dtype=np.uint8)
+        # 遍历每个图像并调整大小
+        for i in range(val_images.shape[0]):
+            if len(val_images.shape) == 4:
+                resized_images[i] = cv2.resize(val_images[i], (256, 256), interpolation=cv2.INTER_AREA)
+            else:
+                resized_images[i] = cv2.resize(cv2.cvtColor(val_images[i], cv2.COLOR_GRAY2BGR),
+                                               (256, 256), interpolation=cv2.INTER_AREA)
+
+        for i in range(10):
             origin_infer_data = resized_images[i]
             origin_mask = val_masks[i]
 

@@ -3,6 +3,7 @@ import subprocess
 import time
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
@@ -41,12 +42,8 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-    if len(val_images.shape) == 3:
-        n_channels = 1
-    else:
-        n_channels = 3
 
-    net = UNet(n_channels=n_channels, n_classes=2)
+    net = UNet(n_channels=3, n_classes=2)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'segmentation_checkpoints')
     if not os.path.exists(target_directory):
@@ -128,7 +125,8 @@ def eval_and_infer(infer_graph_mode=False):
             if len(infer_data.shape) == 3:
                 infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
             else:
-                infer_data = np.reshape(infer_data, (1, 1, infer_data.shape[0], infer_data.shape[1]))/ 127.5 - 1
+                infer_data = np.expand_dims(((cv2.cvtColor(infer_data, cv2.COLOR_GRAY2BGR).astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+
 
             output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
             output_as_numpy = np.argmax(output.asnumpy(), axis=1)

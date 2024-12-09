@@ -63,15 +63,12 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
 
     train_images = np.load(os.path.join("datasets_as_numpy", "train_images.npy"))
     train_masks = np.load(os.path.join("datasets_as_numpy", "train_masks.npy"))
-    if len(train_images.shape) == 3:
-        n_channels = 1
-    else:
-        n_channels = 3
+
     train_dataset = create_segmentation_dataset_at_numpy(train_images, train_masks,
                                                          img_size=config.image_size, mask_size=config.mask_size,
                                                          batch_size=batch_size, num_classes=2,
                                                          is_train=True, augment=False)
-    net = NestedUNet(n_channels=n_channels, n_classes=2, is_train=True)
+    net = NestedUNet(n_channels=3, n_classes=2, is_train=True)
     loss_function = MultiCrossEntropyWithLogits()
     optimizer = nn.Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=0.0,
                         loss_scale=config.loss_scale)
