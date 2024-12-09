@@ -97,8 +97,7 @@ class MultiClassDataset:
         return len(self.val_ids)
 
 
-def preprocess_img_mask(img, mask, num_classes, img_size=(572, 572),  mask_size=(388, 388),
-                        augment=False):
+def preprocess_img_mask(img, mask, num_classes, img_size,  mask_size, augment=False):
     """
     Preprocess for multi-class dataset.数据处理函数
     Random crop and flip images and masks when augment is True.
@@ -136,7 +135,7 @@ def preprocess_img_mask(img, mask, num_classes, img_size=(572, 572),  mask_size=
 
 
 def create_segmentation_dataset(data_dir, img_size, mask_size, repeat, batch_size, num_classes=2, is_train=False, augment=False,
-                               eval_resize=False, split=1, rank=0, group_size=1, shuffle=True):
+                                split=1, rank=0, group_size=1, shuffle=True):
     """
     Get generator dataset for multi-class dataset.
     """

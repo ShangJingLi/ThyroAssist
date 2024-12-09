@@ -13,7 +13,6 @@ from src.deep_learning.dataloader import (create_segmentation_dataset_at_numpy,
 from src.deep_learning.networks import NestedUNet
 from src.deep_learning.utils import get_time
 from src.deep_learning.configuration import NestedUNetConfig
-import sys
 
 
 USE_ORANGE_PI = False
@@ -31,8 +30,31 @@ else:
 
 config = NestedUNetConfig()
 
+val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
+val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
 
-def eval_and_infer(infer_graph_mode=False):
+net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
+current_directory = os.getcwd()
+ckpt_directory = os.path.join(current_directory, 'nested_unet_checkpoints')
+if not os.path.exists(ckpt_directory):
+    download_and_unzip_nested_unet_checkpoints()
+else:
+    pass
+ckpt_file = os.path.join(ckpt_directory, 'nested_unet_checkpoints.ckpt')
+params = mindspore.load_checkpoint(ckpt_file)
+mindspore.load_param_into_net(net, params)
+
+loss_function = nn.DiceLoss()
+optimizer = nn.Adam(params=net.trainable_params(), learning_rate=config.lr, weight_decay=0.00001,
+                    loss_scale=config.loss_scale)
+
+loss_scale_manager = mindspore.train.loss_scale_manager.FixedLossScaleManager(128, False)
+
+model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
+              optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
+
+
+def eval_nested_unet():
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
     if not os.path.exists('datasets_as_numpy'):
@@ -40,32 +62,10 @@ def eval_and_infer(infer_graph_mode=False):
     else:
         pass
 
-    val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
-    val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-
-    net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
-    current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'nested_unet_checkpoints')
-    if not os.path.exists(target_directory):
-        download_and_unzip_nested_unet_checkpoints()
-    else:
-        pass
-    ckpt_file = os.path.join(target_directory, 'nested_unet_checkpoints.ckpt')
-    params = mindspore.load_checkpoint(ckpt_file)
-    mindspore.load_param_into_net(net, params)
     val_dataset = create_segmentation_dataset_at_numpy(val_images, val_masks,
                                                        img_size=config.image_size, mask_size=config.mask_size,
                                                        batch_size=config.eval_batch_size, num_classes=2,
                                                        is_train=False, augment=False)
-    loss_function = nn.DiceLoss()
-    optimizer = nn.Adam(params=net.trainable_params(), learning_rate=config.lr, weight_decay=0.00001,
-                        loss_scale=config.loss_scale)
-
-    loss_scale_manager = mindspore.train.loss_scale_manager.FixedLossScaleManager(128, False)
-
-    model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
-                  optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
-
 
     print("============ Starting Evaluation ============")
     start_time = time.time()
@@ -73,85 +73,57 @@ def eval_and_infer(infer_graph_mode=False):
     print(dice)
     end_time = time.time()
     print("评估时长：", get_time(start_time, end_time))
-
-    if infer_graph_mode:
-        start_time = time.time()
-
-        transposed_val_images = np.transpose(val_images, (0, 3, 1, 2))
-        transposed_val_images = (transposed_val_images.astype(np.float32)) / 127.5 - 1
-        inputs = Tensor(transposed_val_images)
-
-        mindspore.export(net, inputs, file_name='unet_graph', file_format='MINDIR')
-        graph = mindspore.load('unet_graph.mindir')
-        net = nn.GraphCell(graph)
-
-        outputs = net(inputs)
-        outputs = np.argmax(outputs.asnumpy(), axis=1)
-        end_time = time.time()
-        print("推理时长：", get_time(start_time, end_time))
-
-        current_directory = os.getcwd()
-        target_directory = os.path.join(current_directory, 'figures')
-        if not os.path.exists(target_directory):
-            os.makedirs(target_directory)
-        else:
-            pass
-        for i in range(10):
-            fig = plt.figure(figsize=(20, 10))
-            plt.subplot(131)
-            plt.imshow(val_images[2*i+1])
-            plt.subplot(132)
-            plt.imshow(val_masks[2*i+1], cmap='gray')
-            plt.subplot(133)
-            plt.imshow(outputs[2*i+1], cmap='gray')
-            fig.savefig(os.path.join(target_directory, f"{2*i+1}.jpg"))
-
-    else:
-        start_time = time.time()
-        current_directory = os.getcwd()
-        target_directory = os.path.join(current_directory, 'figures')
-        if not os.path.exists(target_directory):
-            os.makedirs(target_directory)
-        else:
-            pass
-
-
-        resized_images = np.zeros(shape=(val_images.shape[0], 256, 256, 3), dtype=np.uint8)
-        # 遍历每个图像并调整大小
-        for i in range(val_images.shape[0]):
-            if len(val_images.shape) == 4:
-                resized_images[i] = cv2.resize(val_images[i], (256, 256), interpolation=cv2.INTER_AREA)
-            else:
-                resized_images[i] = cv2.resize(cv2.cvtColor(val_images[i], cv2.COLOR_GRAY2BGR),
-                                               (256, 256), interpolation=cv2.INTER_AREA)
-
-        for i in range(10):
-            origin_infer_data = resized_images[i]
-            origin_mask = val_masks[i]
-
-            infer_data = np.copy(origin_infer_data)
-            if len(infer_data.shape) == 3:
-                infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
-            else:
-                infer_data = np.reshape(infer_data, (1, 1, infer_data.shape[0], infer_data.shape[1])) / 127.5 - 1
-
-            output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
-            output_as_numpy = np.argmax(output.asnumpy(), axis=1)
-            output_as_numpy = output_as_numpy.reshape(256, 256)
-
-
-            fig = plt.figure(figsize=(20, 10))
-            plt.subplot(131)
-            plt.imshow(origin_infer_data)
-            plt.subplot(132)
-            plt.imshow(origin_mask, cmap='gray')
-            plt.subplot(133)
-            plt.imshow(output_as_numpy, cmap='gray')
-            fig.savefig(os.path.join(target_directory, f"{i}.jpg"))
-        end_time = time.time()
-        print("推理时长：", get_time(start_time, end_time))
     print("============ End Evaluation ============")
+
+
+
+def infer_nested_unet():
+    if USE_ORANGE_PI:
+        os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
+
+    start_time = time.time()
+    target_directory = os.path.join(current_directory, 'figures')
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+    else:
+        pass
+
+    resized_images = np.zeros(shape=(val_images.shape[0], config.image_size[0],
+                                     config.image_size[1], 3), dtype=np.uint8)
+
+    # 遍历每个图像并调整大小
+    for i in range(val_images.shape[0]):
+        if len(val_images.shape) == 4:
+            resized_images[i] = cv2.resize(val_images[i], dsize=config.image_size, interpolation=cv2.INTER_AREA)
+        else:
+            resized_images[i] = cv2.resize(cv2.cvtColor(val_images[i], cv2.COLOR_GRAY2BGR),
+                                           dsize=config.image_size, interpolation=cv2.INTER_AREA)
+
+    for i in range(10):
+        origin_infer_data = resized_images[i]
+        origin_mask = val_masks[i]
+
+        infer_data = np.copy(origin_infer_data)
+        infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+
+        output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
+        output_as_numpy = np.argmax(output.asnumpy(), axis=1)
+        output_as_numpy = output_as_numpy.reshape(256, 256)
+
+        fig = plt.figure(figsize=(20, 10))
+        plt.subplot(131)
+        plt.imshow(origin_infer_data)
+        plt.subplot(132)
+        plt.imshow(origin_mask, cmap='gray')
+        plt.subplot(133)
+        plt.imshow(output_as_numpy, cmap='gray')
+        fig.savefig(os.path.join(target_directory, f"{i}.jpg"))
+    end_time = time.time()
+    print("推理时长：", get_time(start_time, end_time))
+
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
 
-eval_and_infer()
+
+eval_nested_unet()
+infer_nested_unet()

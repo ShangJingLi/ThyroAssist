@@ -29,7 +29,7 @@ class NestedUNetConfig:
     """NestedUNet模型配置"""
     def __init__(self):
         self.lr = 0.00001
-        self.train_epoch = 10
+        self.train_epoch = 50
         self.distribute_epochs = 1600
         self.train_batch_size = 16
         self.eval_batch_size = 1
@@ -37,5 +37,5 @@ class NestedUNetConfig:
         self.weight_decay = 0.0001
         self.loss_scale = 1024
         self.resume = None
-        self.image_size = (512, 512)
-        self.mask_size = (512, 512)
+        self.image_size = (256, 256)
+        self.mask_size = (256, 256)

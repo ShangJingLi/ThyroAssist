@@ -3,7 +3,6 @@ import subprocess
 import time
 import matplotlib.pyplot as plt
 import numpy as np
-import cv2
 import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
@@ -71,79 +70,50 @@ def eval_unet():
     end_time = time.time()
     print("评估时长：", get_time(start_time, end_time))
     print("============ End Evaluation ============")
-
-
-
-def infer_unet(infer_graph_mode=False):
-    if infer_graph_mode:
-        start_time = time.time()
-
-        if len(val_images.shape) == 3:
-            transposed_val_images = np.transpose(val_images, (0, 3, 1, 2))
-        else:
-            transposed_val_images = np.expand_dims(val_images, axis=1)
-        transposed_val_images = (transposed_val_images.astype(np.float32)) / 127.5 - 1
-        inputs = Tensor(transposed_val_images)
-
-        mindspore.export(net, inputs, file_name='unet_graph', file_format='MINDIR')
-        graph = mindspore.load('unet_graph.mindir')
-        net = nn.GraphCell(graph)
-
-        outputs = net(inputs)
-        outputs = np.argmax(outputs.asnumpy(), axis=1)
-        end_time = time.time()
-        print("推理时长：", get_time(start_time, end_time))
-
-        current_directory = os.getcwd()
-        target_directory = os.path.join(current_directory, 'figures')
-        if not os.path.exists(target_directory):
-            os.makedirs(target_directory)
-        else:
-            pass
-        for i in range(10):
-            fig = plt.figure(figsize=(20, 10))
-            plt.subplot(131)
-            plt.imshow(val_images[2*i+1])
-            plt.subplot(132)
-            plt.imshow(val_masks[2*i+1], cmap='gray')
-            plt.subplot(133)
-            plt.imshow(outputs[2*i+1], cmap='gray')
-            fig.savefig(os.path.join(target_directory, f"{2*i+1}.jpg"))
-
-    else:
-        start_time = time.time()
-        current_directory = os.getcwd()
-        target_directory = os.path.join(current_directory, 'figures')
-        if not os.path.exists(target_directory):
-            os.makedirs(target_directory)
-        else:
-            pass
-
-        for i in range(10):
-            origin_infer_data = val_images[i]
-            origin_mask = val_masks[i]
-
-            infer_data = np.copy(origin_infer_data)
-            if len(infer_data.shape) == 3:
-                infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
-            else:
-                infer_data = np.expand_dims(np.tile(infer_data.astype(np.float32), reps=(3, 1, 1)), axis=0)
-
-            output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
-            output_as_numpy = np.argmax(output.asnumpy(), axis=1)
-            output_as_numpy = output_as_numpy.reshape(388, 388)
-
-
-            fig = plt.figure(figsize=(20, 10))
-            plt.subplot(131)
-            plt.imshow(origin_infer_data, cmap='gray')
-            plt.subplot(132)
-            plt.imshow(origin_mask, cmap='gray')
-            plt.subplot(133)
-            plt.imshow(output_as_numpy, cmap='gray')
-            fig.savefig(os.path.join(target_directory, f"{i}.jpg"))
-        end_time = time.time()
-        print("推理时长：", get_time(start_time, end_time))
-
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
+
+
+def infer_unet():
+    if USE_ORANGE_PI:
+        os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
+
+    start_time = time.time()
+    current_directory = os.getcwd()
+    target_directory = os.path.join(current_directory, 'figures')
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
+    else:
+        pass
+
+    for i in range(10):
+        origin_infer_data = val_images[i]
+        origin_mask = val_masks[i]
+
+        infer_data = np.copy(origin_infer_data)
+        if len(infer_data.shape) == 3:
+            infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
+        else:
+            infer_data = np.expand_dims(np.tile(infer_data.astype(np.float32), reps=(3, 1, 1)), axis=0)
+
+        output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
+        output_as_numpy = np.argmax(output.asnumpy(), axis=1)
+        output_as_numpy = output_as_numpy.reshape(388, 388)
+
+
+        fig = plt.figure(figsize=(20, 10))
+        plt.subplot(131)
+        plt.imshow(origin_infer_data, cmap='gray')
+        plt.subplot(132)
+        plt.imshow(origin_mask, cmap='gray')
+        plt.subplot(133)
+        plt.imshow(output_as_numpy, cmap='gray')
+        fig.savefig(os.path.join(target_directory, f"{i}.jpg"))
+    end_time = time.time()
+    print("推理时长：", get_time(start_time, end_time))
+    if USE_ORANGE_PI:
+        os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
+
+
+eval_unet()
+infer_unet()

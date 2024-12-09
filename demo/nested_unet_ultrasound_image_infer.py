@@ -52,8 +52,8 @@ output_data = gr.Image(label="结节位置如下图所示")
 
 def infer_ultrasound_image(image):
     # 图像读取由gradio框架自动进行，为RGB格式
-    image = cv2.resize(np.array(image), dsize=(256, 256))
     copied_image = np.copy(image)
+    image = cv2.resize(np.array(image), dsize=(256, 256))
     if len(image.shape) == 3:
         input_tensor = Tensor(np.expand_dims(image.transpose((2, 0, 1)), axis=0)).astype(mindspore.float32) / 127.5 - 1
     else:
@@ -62,14 +62,14 @@ def infer_ultrasound_image(image):
     output_as_numpy = np.argmax(output_tensor.asnumpy(), axis=1).astype(np.uint8) * 255
     output_as_numpy = output_as_numpy.reshape(256, 256)
 
-    kernel = np.ones((3, 3), np.uint8)
+    kernel = np.ones((5, 5), np.uint8)
     opened_output = cv2.morphologyEx(output_as_numpy, cv2.MORPH_OPEN, kernel)
     processed_output = cv2.morphologyEx(opened_output, cv2.MORPH_CLOSE, kernel)
 
-    resized_output = cv2.resize(processed_output, dsize=(256, 256))
+    resized_output = cv2.resize(processed_output, dsize=(572, 572))
     contours, hierarchy = cv2.findContours(resized_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    res = cv2.drawContours(copied_image, contours, -1, (100, 255, 0), 1)
-    return cv2.resize(res, dsize=(388, 388))
+    res = cv2.drawContours(cv2.resize(copied_image, dsize=(572, 572)), contours, -1, (100, 255, 0), 1)
+    return res
 
 
 iface = gr.Interface(fn=infer_ultrasound_image,
