@@ -3,4 +3,4 @@
 pip install -r requirements.txt
 
 # run the demo
-python demo/ultrasound_image_infer.py
+python demo/unet_ultrasound_image_infer.py
