@@ -10,6 +10,11 @@ mlp_datasets/
 best_mlp_checkpoints/
 flagged/
 kernel_meta/
+train_images.npy
+val_images.npy
+train_masks.npy
+val_masks.npy
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
