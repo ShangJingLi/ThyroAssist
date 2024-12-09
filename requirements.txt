@@ -4,7 +4,7 @@ opencv-python~=4.10.0.84
 opencv-contrib-python
 pandas~=2.2.3
 openi~=2.0.2.post3
-mindspore>=2.2.14
+mindspore
 multiprocess~=0.70.17
 requests~=2.32.3
 gradio
