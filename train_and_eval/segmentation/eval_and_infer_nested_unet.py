@@ -41,7 +41,7 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-    if len(val_images) == 3:
+    if len(val_images.shape) == 3:
         n_channels = 1
     else:
         n_channels = 3

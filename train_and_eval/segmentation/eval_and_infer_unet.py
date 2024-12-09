@@ -41,7 +41,7 @@ def eval_and_infer(infer_graph_mode=False):
 
     val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
     val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
-    if len(val_images) == 3:
+    if len(val_images.shape) == 3:
         n_channels = 1
     else:
         n_channels = 3
@@ -79,7 +79,7 @@ def eval_and_infer(infer_graph_mode=False):
     if infer_graph_mode:
         start_time = time.time()
 
-        if len(val_images) == 3:
+        if len(val_images.shape) == 3:
             transposed_val_images = np.transpose(val_images, (0, 3, 1, 2))
         else:
             transposed_val_images = np.expand_dims(val_images, axis=1)
