@@ -11,9 +11,7 @@ FILE="/swapfile"
  
 # 检查文件是否存在
 if [ ! -e "$FILE" ]; then
-    echo "swapfile 不存在，执行某些命令..."
-    
-
+    echo "swapfile 不存在，开始执行swap分区创建"
     sudo fallocate -l 16G /swapfile
     sudo mkswap /swapfile
     sudo swapon /swapfile
