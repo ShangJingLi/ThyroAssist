@@ -1,4 +1,29 @@
 import time
+import mindspore
+
+
+class StopTimeMonitor(mindspore.Callback):
+    def __init__(self, run_time):
+        super(StopTimeMonitor, self).__init__()
+        self.run_time = run_time
+
+    def on_train_begin(self, run_context):
+        cb_params = run_context.original_args()
+        cb_params.init_time = time.time()  # 获取开始训练的时间
+
+    def on_train_step_end(self, run_context):
+        """每个step结束后执行的操作"""
+        cb_params = run_context.original_args()
+        epoch_num = cb_params.cur_epoch_num  # 获取epoch值
+        step_num = cb_params.cur_step_num  # 获取step值
+        loss = cb_params.net_outputs  # 获取损失值loss
+        cur_time = time.time()  # 获取当前时间戳
+
+        if (cur_time - cb_params.init_time) > self.run_time:
+            # 当训练时间达到规定的停止时间时，停止训练
+            train_time = get_time(cur_time, cb_params.init_time)
+            print(f"训练中止！ 用时: {train_time}, 当前epoch: {epoch_num}, 当前: {step_num}, loss:{loss}")
+            run_context.request_stop()
 
 
 def get_time(start: time.time, end:time.time):
@@ -52,4 +77,5 @@ def restore_ckpt(part_prefix, output_file):
 
 __all__ = ['get_time',
            'split_ckpt',
-           'restore_ckpt']
+           'restore_ckpt',
+           'StopTimeMonitor']

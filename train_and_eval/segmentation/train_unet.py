@@ -9,7 +9,7 @@ from mindspore import context
 from mindspore.train.callback import LossMonitor
 from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
 from src.deep_learning.networks import UNet
-from src.deep_learning.utils import get_time
+from src.deep_learning.utils import get_time, StopTimeMonitor
 from src.deep_learning.configuration import UNetConfig
 #
 #                       _oo0oo_
@@ -81,8 +81,8 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
                   optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
     print("============ Starting Training ============")
     start_time = time.time()
-    model.train(epoch, train_dataset, callbacks=[LossMonitor(1), early_stop],
-                dataset_sink_mode=False)
+    model.train(epoch, train_dataset, callbacks=[LossMonitor(1), StopTimeMonitor(12600)],
+                dataset_sink_mode=True)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'unet_checkpoints')
     if not os.path.exists(target_directory):
