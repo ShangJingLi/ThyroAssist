@@ -67,7 +67,7 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
     train_dataset = create_segmentation_dataset_at_numpy(train_images, train_masks,
                                                          img_size=config.image_size,
                                                          mask_size=config.mask_size,
-                                                         batch_size=config.train_batch_size,
+                                                         batch_size=batch_size,
                                                          num_classes=2, is_train=True, augment=False)
     net = UNet(n_channels=3, n_classes=2)
     loss_function = nn.DiceLoss()
@@ -75,12 +75,13 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
                         loss_scale=config.loss_scale)
 
     loss_scale_manager = mindspore.train.loss_scale_manager.FixedLossScaleManager(128, False)
-
+    early_stop = mindspore.EarlyStopping(monitor='eval_loss', min_delta=0, patience=50,
+                                         verbose=True, mode='auto', restore_best_weights=True)
     model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
                   optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
     print("============ Starting Training ============")
     start_time = time.time()
-    model.train(epoch, train_dataset, callbacks=[LossMonitor(1)],
+    model.train(epoch, train_dataset, callbacks=[LossMonitor(1), early_stop],
                 dataset_sink_mode=False)
     current_directory = os.getcwd()
     target_directory = os.path.join(current_directory, 'unet_checkpoints')
