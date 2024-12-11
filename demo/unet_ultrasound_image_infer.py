@@ -8,7 +8,7 @@ import gradio as gr
 import mindspore
 from mindspore import Tensor, context
 from src.deep_learning.networks import UNet
-from src.deep_learning.dataloader import download_and_unzip_unet_checkpoints
+from src.deep_learning.dataloader import download_and_unzip_unet_checkpoints, download_ultrasound_images
 
 USE_ORANGE_PI = False
 if os.name == 'nt':
@@ -32,13 +32,18 @@ signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
 current_directory = os.getcwd()
-target_directory = os.path.join(current_directory, 'unet_checkpoints')
-if not os.path.exists(target_directory):
+ckpt_path = os.path.join(current_directory, 'unet_checkpoints')
+if not os.path.exists(ckpt_path):
     download_and_unzip_unet_checkpoints()
 else:
     pass
-ckpt_file = os.path.join(target_directory, 'unet_checkpoints.ckpt')
+ckpt_file = os.path.join(ckpt_path, 'unet_checkpoints.ckpt')
 
+image_path = os.path.join(current_directory, 'ultrasound_images_to_show')
+if not os.path.exists(image_path):
+    download_ultrasound_images()
+else:
+    pass
 
 net = UNet(n_channels=3, n_classes=2)
 params = mindspore.load_checkpoint(ckpt_file)

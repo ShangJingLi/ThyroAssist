@@ -94,7 +94,7 @@ def infer_unet():
         if len(infer_data.shape) == 3:
             infer_data = np.expand_dims(((infer_data.astype(np.float32)) / 127.5 - 1).transpose(2, 0, 1), axis=0)
         else:
-            infer_data = np.expand_dims(np.tile(infer_data.astype(np.float32), reps=(3, 1, 1)), axis=0)
+            infer_data = np.expand_dims(np.tile(infer_data.astype(np.float32), reps=(3, 1, 1)), axis=0) / 127.5 - 1
 
         output = model.predict(Tensor(infer_data, dtype=mindspore.float32))
         output_as_numpy = np.argmax(output.asnumpy(), axis=1)

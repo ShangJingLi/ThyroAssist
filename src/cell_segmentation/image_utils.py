@@ -151,7 +151,7 @@ def draw_counters(image:np.array, thresh:np.array):
                 cv2.drawContours(copied_image, [hull], -1, (0, 255, 0), 2)  # 使用绿色轮廓线
 
 
-def download_images():
+def download_pathological_images():
     openi.download_file(repo_id="enter/nodule_segmentation", file="image_to_show.zip", cluster="NPU",
                                 save_path=".",
                                 force=False)
@@ -234,5 +234,5 @@ __all__ = ['segmentation_by_threshold',
            'draw_counters',
            'get_time',
            'rename_jpg_files',
-           'download_images',
+           'download_pathological_images',
            'watershed_algorthm']
