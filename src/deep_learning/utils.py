@@ -21,7 +21,7 @@ class StopTimeMonitor(mindspore.Callback):
 
         if (cur_time - cb_params.init_time) > self.run_time:
             # 当训练时间达到规定的停止时间时，停止训练
-            train_time = get_time(cur_time, cb_params.init_time)
+            train_time = get_time(cb_params.init_time， cur_time)
             print(f"训练中止！ 用时: {train_time}, 当前epoch: {epoch_num}, 当前: {step_num}, loss:{loss}")
             run_context.request_stop()
 
