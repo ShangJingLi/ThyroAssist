@@ -12,12 +12,13 @@ class AclLiteResource:
     """
     AclLiteResource
     """
+
     def __init__(self, device_id=0):
         self.device_id = device_id
         self.context = None
         self.stream = None
         self.run_mode = None
-        
+
     def init(self):
         """
         init resource
@@ -54,15 +55,22 @@ class AclLiteResource:
         acl.rt.reset_device(self.device_id)
         print("Release acl resource success")
 
-# 初始化资源
-acl_resource = AclLiteResource()
-acl_resource.init()
+# 初始化资源和加载模型作为全局变量
+acl_resource = None
+model = None
 
-path = os.getcwd()
-model_path = os.path.join(path, "nested_unet.om")
-model = AclLiteModel(model_path)
+def initialize_resources():
+    global acl_resource, model
+    acl_resource = AclLiteResource()
+    acl_resource.init()
+    path = os.getcwd()
+    model_path = os.path.join(path, "nested_unet.om")
+    model = AclLiteModel(model_path)
+
+initialize_resources()
 
 def infer_ultrasound_image(image):
+    global model
     # 图像读取由gradio框架自动进行，为RGB格式
     image = np.array(image).astype(np.uint8)
     copied_image = np.copy(image)
@@ -90,9 +98,11 @@ def infer_ultrasound_image(image):
 input_data = gr.Image(label='请输入甲状腺超声图像')
 output_data = gr.Image(label="结节位置如下图所示")
 
-iface = gr.Interface(fn=infer_ultrasound_image,
-                     inputs=input_data,
-                     outputs=output_data,
-                     title = "基于UNet++的甲状腺超声结节区域检测器",
-                     description = "选择甲状腺超声图像，通过图像分割和轮廓检测确定结节区域。")
+iface = gr.Interface(
+    fn=infer_ultrasound_image,
+    inputs=input_data,
+    outputs=output_data,
+    title="基于UNet++的甲状腺超声结节区域检测器",
+    description="选择甲状腺超声图像，通过图像分割和轮廓检测确定结节区域。"
+)
 iface.launch()
