@@ -164,3 +164,7 @@ checkpoint-*/
 
 fusion_result.json
 aclinit.json
+
+*.om
+*.air
+*.onnx
