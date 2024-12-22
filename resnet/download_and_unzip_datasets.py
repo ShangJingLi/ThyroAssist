@@ -5,7 +5,7 @@ import openi
 
 # 定义下载函数，包含进度打印
 def download_and_unzip():
-    openi.download_file(repo_id="enter/enter202404211533475", file="datasets.zip", cluster="NPU",
+    openi.download_file(repo_id="enter/nodule_segmentation", file="datasets.zip", cluster="NPU",
                         save_path="",
                         force=False)
     zip_file_path = 'datasets.zip'

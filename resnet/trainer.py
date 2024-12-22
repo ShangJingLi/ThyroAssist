@@ -103,7 +103,7 @@ ckpt_save_dir = config.output_dir
 
 
 print('========================== Starting Training ==========================')
-model.train(config.epoch_size, ds_train, callbacks=cb,
+model.train(200, ds_train, callbacks=cb,
             sink_size=ds_train.get_dataset_size(), dataset_sink_mode=config.dataset_sink_mode)
 
 dir_name = "checkpoints"
