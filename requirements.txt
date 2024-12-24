@@ -10,4 +10,4 @@ requests
 gradio
 docutils
 fonttools
-pylint
+pylint==2.17
