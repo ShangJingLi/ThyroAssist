@@ -30,6 +30,9 @@ def segmentation_by_threshold(image:np.array, low:int, high:int):
     if len(image.shape) != 2:
         raise TypeError("请输入灰度图像！")
 
+    if low > high:
+        raise ValueError("下阈值必须小于上阈值！")
+
     _, thresh1 = cv2.threshold(image, high, 255, cv2.THRESH_BINARY_INV)  # 低的值设为白，即设置上界
     _, thresh2 = cv2.threshold(image, low, 255, cv2.THRESH_BINARY)
 
@@ -56,13 +59,13 @@ def cells_segmentation(image: np.array):
     ch, _, _ = cv2.split(hsv_clone_image)
 
     # 每个通道做一次阈值分割
-    h_thresh = segmentation_by_threshold(ch, H_LOW, H_HIGH).astype(np.bool)
-    s_thresh = segmentation_by_threshold(s, S_LOW, S_HIGH).astype(np.bool)
-    v_thresh = segmentation_by_threshold(v, V_LOW, V_HIGH).astype(np.bool)
+    h_thresh = segmentation_by_threshold(ch, H_LOW, H_HIGH).astype(np.bool_)
+    s_thresh = segmentation_by_threshold(s, S_LOW, S_HIGH).astype(np.bool_)
+    v_thresh = segmentation_by_threshold(v, V_LOW, V_HIGH).astype(np.bool_)
 
-    b_thresh = segmentation_by_threshold(b, B_LOW, B_HIGH).astype(np.bool)
-    g_thresh = segmentation_by_threshold(g, G_LOW, G_HIGH).astype(np.bool)
-    r_thresh = segmentation_by_threshold(r, R_LOW, R_HIGH).astype(np.bool)
+    b_thresh = segmentation_by_threshold(b, B_LOW, B_HIGH).astype(np.bool_)
+    g_thresh = segmentation_by_threshold(g, G_LOW, G_HIGH).astype(np.bool_)
+    r_thresh = segmentation_by_threshold(r, R_LOW, R_HIGH).astype(np.bool_)
 
     thresh = h_thresh & s_thresh & v_thresh & b_thresh & g_thresh & r_thresh
     thresh = thresh.astype(np.uint8)
@@ -120,14 +123,24 @@ def rename_jpg_files(directory:str, start:int):
 
 def std_cleaner(image: np.array):
     """对RGB通道像素值相近的像素点进行去标准差操作，
-       减少计算色调时的测量误差"""
+       减少计算色调时的测量误差。使用向量化操作提升性能。
+    """
+    # 复制图像以避免修改原始图像
     clone_image = np.copy(image)
-    for i in range(clone_image.shape[0]):
-        for j in range(clone_image.shape[1]):
-            single_pixel = clone_image[i][j]
-            if np.std(single_pixel) < 5:
-                mean = np.mean(single_pixel)
-                clone_image[i][j] = np.array([mean, mean, mean]).astype(np.uint8)
+
+    # 计算每个像素的标准差
+    std_dev = np.std(clone_image, axis=2)
+
+    # 找到标准差小于5的像素位置
+    mask = std_dev < 5
+
+    # 计算这些像素的均值，并设置为灰度值
+    mean_values = np.mean(clone_image, axis=2, keepdims=True)
+    clone_image[mask, :] = mean_values[mask, :]  # 在保持维度的前提下赋值
+
+    # 确保输出是uint8类型
+    clone_image = np.clip(clone_image, 0, 255).astype(np.uint8)
+
     return clone_image
 
 
@@ -176,7 +189,8 @@ def download_pathological_images():
 def power(image, power_value):
     copied_image = np.copy(image)
 
-    normalized_image = cv2.normalize(copied_image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    normalized_image = cv2.normalize(copied_image, None, alpha=0, beta=1,
+                                     norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
     normalized_image = np.power(normalized_image, power_value)
     copied_image = np.uint8(normalized_image * 255)
 
