@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import gradio as gr
 from src.deep_learning.dataloader import download_ultrasound_images
+from src.deep_learning.utils import is_ascend_available, is_gpu_available
 
 
 USE_ORANGE_PI = False
@@ -17,7 +18,8 @@ if os.name == 'nt':  # Windows操作系统, 使用CPU
     from src.deep_learning.networks import NestedUNet
     from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
-else:  # 非Windows操作系统，优先使用Ascend，若无效则使用GPU
+    print("使用CPU环境启动模型推理")
+else:
     try:
         current_user = subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip()
         if current_user == 'HwHiAiUser':  # 如果当前用户是HwHiAiUser
@@ -27,26 +29,36 @@ else:  # 非Windows操作系统，优先使用Ascend，若无效则使用GPU
             from acllite_resource import resource_list
             from src.deep_learning.dataloader import download_nested_unet_om
             USE_ORANGE_PI = True
-        else:  # 当前用户不是HwHiAiUser，优先使用Ascend环境
+            print("使用香橙派启动模型推理，模型格式为.om")
+        elif is_ascend_available():  # 检测Ascend环境是否可用
             import mindspore
             from mindspore import Tensor, context
             from src.deep_learning.networks import NestedUNet
             from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
             context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
-    except ImportError:  # 如果Ascend不可用或发生ImportError，则使用GPU
-        try:
+            print("使用Ascend环境启动模型推理")
+        elif is_gpu_available():  # 检测GPU环境是否可用
             import mindspore
             from mindspore import Tensor, context
             from src.deep_learning.networks import NestedUNet
             from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-
             context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
-        except ImportError:  # 如果GPU也不可用，则回退到CPU
+            print("使用GPU环境启动模型推理")
+        else:  # 如果Ascend和GPU都不可用，回退到CPU
             import mindspore
             from mindspore import Tensor, context
             from src.deep_learning.networks import NestedUNet
             from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
             context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+            print("使用CPU环境启动模型推理")
+    except Exception as e:  # 捕获所有意外错误并回退到CPU
+        print(f"Error detected: {e}")
+        import mindspore
+        from mindspore import Tensor, context
+        from src.deep_learning.networks import NestedUNet
+        from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+        context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+        print("出现意外错误！使用CPU环境启动模型推理")
 
 # 若进程终止，将风扇速度降低
 def on_terminate(signum, frame):

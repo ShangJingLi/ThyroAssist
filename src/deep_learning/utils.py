@@ -75,7 +75,28 @@ def restore_ckpt(part_prefix, output_file):
     print("文件恢复完成！")
 
 
+def is_ascend_available():
+    """检测Ascend环境是否可用"""
+    try:
+        from mindspore import context
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+        return True
+    except (ImportError, RuntimeError):
+        return False
+
+def is_gpu_available():
+    """检测GPU环境是否可用"""
+    try:
+        from mindspore import context
+        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+        return True
+    except (ImportError, RuntimeError):
+        return False
+
+
 __all__ = ['get_time',
            'split_ckpt',
            'restore_ckpt',
-           'StopTimeMonitor']
+           'StopTimeMonitor',
+           'is_gpu_available',
+           'is_ascend_available']
