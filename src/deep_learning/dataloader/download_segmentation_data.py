@@ -45,7 +45,17 @@ def download_and_unzip_unet_checkpoints():
     else:
         print(f'文件 {zip_file_path} 不存在。')
 
-    print('数据集下载和解压已完成')
+    print('模型下载和解压已完成')
+
+
+def download_unet_om():
+    openi.download_model(repo_id="enter/nodule_segmentation",
+                         model_name="unet",save_path=".")
+
+    model_path = 'unet.om'
+    # 检查ZIP文件是否存在
+    if os.path.exists(model_path):
+        print('模型文件 unet.om 下载已完成')
 
 
 def download_and_unzip_nested_unet_checkpoints():
@@ -67,7 +77,17 @@ def download_and_unzip_nested_unet_checkpoints():
     else:
         print(f'文件 {zip_file_path} 不存在。')
 
-    print('数据集下载和解压已完成')
+    print('模型下载和解压已完成')
+
+
+def download_nested_unet_om():
+    openi.download_model(repo_id="enter/nodule_segmentation",
+                         model_name="nested_unet",save_path=".")
+
+    model_path = 'nested_unet.om'
+    # 检查ZIP文件是否存在
+    if os.path.exists(model_path):
+        print('模型文件 nested_unet.om 下载已完成')
 
 
 def download_ultrasound_images():
@@ -95,4 +115,6 @@ def download_ultrasound_images():
 __all__ = ['download_and_unzip_segmentation_datasets',
            'download_and_unzip_unet_checkpoints',
            'download_and_unzip_nested_unet_checkpoints',
-           'download_ultrasound_images']
+           'download_ultrasound_images',
+           'download_unet_om',
+           'download_nested_unet_om']
