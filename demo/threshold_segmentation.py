@@ -2,6 +2,7 @@ import gradio as gr
 import cv2
 import numpy as np
 from src.image_processor.image_utils import segmentation_by_threshold, std_cleaner
+"""调节各通道阈值以达到最佳分割效果"""
 
 css = """
 #image_input_container {
