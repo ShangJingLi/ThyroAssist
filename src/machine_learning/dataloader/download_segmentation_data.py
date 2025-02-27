@@ -2,7 +2,6 @@ import os
 import zipfile
 import openi
 
-
 # 定义下载函数，包含进度打印
 def download_and_unzip_segmentation_datasets():
     openi.download_file(repo_id="enter/nodule_segmentation", file="datasets_as_numpy.zip", cluster="NPU",

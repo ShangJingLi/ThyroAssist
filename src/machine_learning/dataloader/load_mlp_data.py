@@ -1,10 +1,13 @@
 import numpy as np
 import pandas as pd
 from mindspore import dataset as ds
-from src.deep_learning.configuration import MlpModelConfig
+from src.machine_learning.configuration import MlpModelConfig
 
 config = MlpModelConfig()
 
+TITLE = ["Area", "Mean", "StdDev", "Mode", "Min", "Max", "Rerim.",
+         "Circ.", "Feret", "Median", "FeretX", "FeretY", "FeretAngle",
+         "MinFeret", "AR", "Round", "Solidity"]
 
 class SyntheticData:
     def __init__(self, features, labels):
@@ -60,4 +63,5 @@ def create_mlp_dataset(cancer_cell_data_path, not_cancer_cell_data_path):
     return train_dataset, eval_dataset
 
 
-__all__ = ['create_mlp_dataset']
+__all__ = ["TITLE",
+           "create_mlp_dataset"]

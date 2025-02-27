@@ -11,3 +11,7 @@ gradio
 docutils
 fonttools
 pylint==2.17
+scikit-learn
+scikit-image
+joblib
+scipy

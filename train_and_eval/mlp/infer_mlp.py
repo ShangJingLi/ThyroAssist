@@ -3,8 +3,8 @@ import subprocess
 import numpy as np
 import mindspore
 from mindspore import nn, Tensor, context
-from src.deep_learning.configuration import MlpModelConfig
-from src.deep_learning.networks import CellSortMlp
+from src.machine_learning.configuration import MlpModelConfig
+from src.machine_learning.networks import CellSortMlp
 
 USE_ORANGE_PI = False
 if os.name == 'nt':

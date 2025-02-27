@@ -5,8 +5,8 @@ import sys
 import cv2
 import numpy as np
 import gradio as gr
-from src.deep_learning.dataloader import download_ultrasound_images
-from src.deep_learning.utils import is_ascend_available, is_gpu_available
+from src.machine_learning.dataloader import download_ultrasound_images
+from src.machine_learning.utils import is_ascend_available, is_gpu_available
 
 
 USE_ORANGE_PI = False
@@ -15,8 +15,8 @@ USE_ORANGE_PI = False
 if os.name == 'nt':  # Windows操作系统, 使用CPU
     import mindspore
     from mindspore import Tensor, context
-    from src.deep_learning.networks import NestedUNet
-    from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+    from src.machine_learning.networks import UNet
+    from src.machine_learning.dataloader import download_and_unzip_unet_checkpoints
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
     print("使用CPU环境启动模型推理")
 else:
@@ -27,36 +27,36 @@ else:
             import acllite_utils as utils
             from acllite_model import AclLiteModel
             from acllite_resource import resource_list
-            from src.deep_learning.dataloader import download_nested_unet_om
+            from src.machine_learning.dataloader import download_unet_om
             USE_ORANGE_PI = True
             print("使用香橙派启动模型推理，模型格式为.om")
         elif is_ascend_available():  # 检测Ascend环境是否可用
             import mindspore
             from mindspore import Tensor, context
-            from src.deep_learning.networks import NestedUNet
-            from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+            from src.machine_learning.networks import UNet
+            from src.machine_learning.dataloader import download_and_unzip_unet_checkpoints
             context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
             print("使用Ascend环境启动模型推理")
         elif is_gpu_available():  # 检测GPU环境是否可用
             import mindspore
             from mindspore import Tensor, context
-            from src.deep_learning.networks import NestedUNet
-            from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+            from src.machine_learning.networks import UNet
+            from src.machine_learning.dataloader import download_and_unzip_unet_checkpoints
             context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
             print("使用GPU环境启动模型推理")
         else:  # 如果Ascend和GPU都不可用，回退到CPU
             import mindspore
             from mindspore import Tensor, context
-            from src.deep_learning.networks import NestedUNet
-            from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+            from src.machine_learning.networks import UNet
+            from src.machine_learning.dataloader import download_and_unzip_unet_checkpoints
             context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
             print("使用CPU环境启动模型推理")
     except Exception as e:  # 捕获所有意外错误并回退到CPU
         print(f"Error detected: {e}")
         import mindspore
         from mindspore import Tensor, context
-        from src.deep_learning.networks import NestedUNet
-        from src.deep_learning.dataloader import download_and_unzip_nested_unet_checkpoints
+        from src.machine_learning.networks import UNet
+        from src.machine_learning.dataloader import download_and_unzip_unet_checkpoints
         context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
         print("出现意外错误！使用CPU环境启动模型推理")
 
@@ -119,25 +119,25 @@ if USE_ORANGE_PI:
 
     acl_resource = AclLiteResource()
     acl_resource.init()
-    model_path = os.path.join(current_directory, "nested_unet.om")
+    model_path = os.path.join(current_directory, "unet.om")
     if not os.path.exists(model_path):
-        download_nested_unet_om()
+        download_unet_om()
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(current_directory, 'nested_unet_checkpoints')
+    ckpt_path = os.path.join(current_directory, 'unet_checkpoints')
     if not os.path.exists(ckpt_path):
-        download_and_unzip_nested_unet_checkpoints()
-    ckpt_file = os.path.join(ckpt_path, 'nested_unet_checkpoints.ckpt')
+        download_and_unzip_unet_checkpoints()
+    ckpt_file = os.path.join(ckpt_path, 'unet_checkpoints.ckpt')
 
-    net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
+    net = UNet(n_channels=3, n_classes=2)
     params = mindspore.load_checkpoint(ckpt_file)
     mindspore.load_param_into_net(net, params)
 
 # 定义gradio的Interface类
 def infer_ultrasound_image(image):
     copied_image = np.copy(image)
-    image = cv2.resize(image, dsize=(256, 256))
+    image = cv2.resize(image, dsize=(572, 572))
 
     if USE_ORANGE_PI:
         context, _ = acl.rt.get_context()
@@ -146,12 +146,12 @@ def infer_ultrasound_image(image):
         input_array = np.expand_dims(image.astype(np.float32).transpose((2, 0, 1)), axis=0) / 127.5 - 1
         result = model.execute([input_array])
         output_as_numpy = np.argmax(result[0], axis=1).astype(np.uint8) * 255
-        output_as_numpy = output_as_numpy.reshape(256, 256)
+        output_as_numpy = output_as_numpy.reshape(388, 388)
     else:
         input_tensor = Tensor(np.expand_dims(image.transpose((2, 0, 1)), axis=0).astype(np.float32)) / 127.5 - 1
         output_tensor = net(input_tensor)
         output_as_numpy = np.argmax(output_tensor.asnumpy(), axis=1).astype(np.uint8) * 255
-        output_as_numpy = output_as_numpy.reshape(256, 256)
+        output_as_numpy = output_as_numpy.reshape(388, 388)
 
     kernel = np.ones((5, 5), np.uint8)
     opened_output = cv2.morphologyEx(output_as_numpy, cv2.MORPH_OPEN, kernel)

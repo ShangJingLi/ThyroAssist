@@ -7,10 +7,10 @@ from mindspore import nn
 from mindspore import Model
 from mindspore import context
 from mindspore.train.callback import LossMonitor
-from src.deep_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
-from src.deep_learning.networks import UNet
-from src.deep_learning.utils import get_time, StopTimeMonitor
-from src.deep_learning.configuration import UNetConfig
+from src.machine_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
+from src.machine_learning.networks import UNet
+from src.machine_learning.utils import get_time, StopTimeMonitor
+from src.machine_learning.configuration import UNetConfig
 #
 #                       _oo0oo_
 #                      o8888888o

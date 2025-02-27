@@ -1,5 +1,5 @@
-from src import deep_learning
-from src import cell_segmentation
+from src import machine_learning
+from src import image_processor
 
 __all__ = ['deep_learning',
            'cell_segmentation']

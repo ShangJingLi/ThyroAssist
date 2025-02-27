@@ -8,10 +8,24 @@ import pandas as pd
 import mindspore
 from mindspore import Tensor
 from mindspore import context
-from src.deep_learning.dataloader import download_and_unzip_best_mlp_checkpoints, download_and_unzip_mlp_datasets
-from src.deep_learning.networks import CellSortMlp
-# cancer前大于后，not_cancer后大于前
+from src.machine_learning.dataloader import download_and_unzip_best_mlp_checkpoints, download_and_unzip_mlp_datasets
+from src.machine_learning.networks import CellSortMlp
+"""单甲状腺上皮细胞特征检测器,
+   癌变细胞标签为[1, 0]，正常细胞标签为[0, 1],
+   数据尺度要求：0.25 微米/像素"""
 
+
+MEAN = np.array([5.12456848e+01, 8.54135088e+01, 1.42719344e+01, 7.80080000e+01,
+                  5.5712e+01, 1.402496e+02, 2.63336016e+01, 8.94158400e-01,
+                  9.14244480e+00, 8.27600000e+01, 1.19590080e+03, 1.06849920e+03,
+                  8.45765616e+01, 7.1711632, 1.26164320, 8.11416000e-01,
+                  9.728832e-01]).astype(np.float32)
+
+STD = np.array([1.90583571e+01, 2.80879155e+01, 4.29302940e+00, 2.99940421e+01,
+                2.38584958e+01, 3.19020703e+01, 5.34224124e+00, 4.70980517e-02,
+                1.90564516e+00, 2.84534595e+01, 3.98852822e+02, 3.59792823e+02,
+                4.88220625e+01, 1.54805123e+00, 2.15220092e-01, 1.13677582e-01,
+                9.75784313e-03]).astype(np.float32)
 
 USE_ORANGE_PI = False
 if os.name == 'nt':
@@ -56,45 +70,40 @@ signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
 # 定义输入组件
-dataframe_input = gr.Dataframe(
-    label="Input DataFrame",
-    headers=["Area", "Mean", "StdDev", "Mode", "Min", "Max", "Perim", "Circ", "Feret", "Median",
-             "FeretX", "FeretY", "FeretAngle", "MinFeret", "AR", "Round", "Solidity"],  # 自定义列名
-    row_count=1,  # 默认行数
-    col_count=17,   # 默认列数
-)
+dataframe_input = gr.File()
 
 # 定义输出组件
-output = gr.Dataframe(label='预测结果', headers=["Prediction"], row_count=1)
+output = gr.Textbox(label='预测结果')
 
-def infer_single_cell(input_datas):
-    results = []
-    for i in range(input_datas.shape[0]):
-        data = input_datas.iloc[i:i+1, :]
-        flag = 0
-        try:
-            numpy_data = data.iloc[:, :17].values.astype(np.float32)
-            flag = 1
-        except:
-            results.append(['!!input error!!'])  # 转numpy有问题就直接返回error
-        if flag == 1:
-            processed_numpy_data = (numpy_data - means) / stds
-            tensor_data = mindspore.Tensor(processed_numpy_data.astype(np.float32))
-            result = net(tensor_data)
-            if result[0][0] > result[0][1]:
-                results.append(['==cancer cell=='])
-            else:
-                results.append(['==not cancer cell=='])
-    output_datas = pd.DataFrame(results, columns=["预测结果"])
-    return output_datas
+def infer_single_cell(input_features):
+    input_features = pd.read_csv(input_features.name)
+
+    features = input_features.iloc[:, 1:].values.astype(np.float32)
+    features = (features - MEAN) / STD
+
+    counts = 0
+
+    input_tensor = Tensor(features)
+    for i in range(input_tensor.shape[0]):
+        result = net(input_tensor[i])
+        print(result)
+        if result[0] > result[1]:
+            counts += 1
+
+    if counts == 0:
+        text = "经模型检测，未发现带有癌细胞特征的样本"
+    else:
+        text = f"经模型检测，共{counts}个样本具有疑似癌细胞的特征"
+
+    return text
 
 # 创建 Gradio 接口
 iface = gr.Interface(
     fn=infer_single_cell,
     inputs=dataframe_input,
     outputs=output,
-    title="单甲状腺上皮细胞特征检测器",
-    description="通过手动输入特征，使用多层感知机预测单个细胞是否属于癌细胞。"
+    title="甲状腺上皮细胞特征检测器",
+    description="上传特征文件，检测细胞是否属于癌细胞"
 )
 
 iface.launch()

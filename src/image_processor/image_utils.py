@@ -144,16 +144,18 @@ def std_cleaner(image: np.array):
     return clone_image
 
 
-def draw_counters(image:np.array, thresh:np.array):
+def draw_contours(image:np.array, thresh:np.array):
     """对分割完成的二值图像进行轮廓绘制操作"""
 
     copied_image = np.copy(image)  # 复制原始图像作为轮廓背景
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    target_contours = []
 
     for contour in contours:
         epsilon = 0.02 * cv2.arcLength(contour, True)  # 设置逼近精度
         approx = cv2.approxPolyDP(contour, epsilon, True)  # 用多边形逼近轮廓，降低复杂度
         length = cv2.arcLength(approx, True)  # 计算轮廓长度
+
 
         # 筛选轮廓:根据周长平方和面积之比筛选轮廓，确保所绘制的轮廓均只包含单个细胞
         if 90 < length < 180 and cv2.arcLength(approx, True) ** 2 / (4 * np.pi * cv2.contourArea(approx)) < 1.6:
@@ -161,7 +163,10 @@ def draw_counters(image:np.array, thresh:np.array):
                 pass
             else:
                 hull = cv2.convexHull(approx)  # 取凸包作为绘制轮廓
-                cv2.drawContours(copied_image, [hull], -1, (0, 255, 0), 2)  # 使用绿色轮廓线
+                cv2.drawContours(copied_image, [hull], -1, (0, 255, 0), 1)  # 使用绿色轮廓线
+                target_contours.append(contour)
+
+    return copied_image, target_contours
 
 
 def download_pathological_images():
@@ -245,7 +250,7 @@ def watershed_algorthm(image):
 __all__ = ['segmentation_by_threshold',
            'cells_segmentation',
            'std_cleaner',
-           'draw_counters',
+           'draw_contours',
            'get_time',
            'rename_jpg_files',
            'download_pathological_images',

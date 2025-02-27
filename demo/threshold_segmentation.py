@@ -1,7 +1,7 @@
 import gradio as gr
 import cv2
 import numpy as np
-from src.cell_segmentation.image_utils import segmentation_by_threshold, std_cleaner
+from src.image_processor.image_utils import segmentation_by_threshold, std_cleaner
 
 css = """
 #image_input_container {

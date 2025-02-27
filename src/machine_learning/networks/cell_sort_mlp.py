@@ -1,5 +1,5 @@
 from mindspore import nn
-from src.deep_learning.configuration import MlpModelConfig
+from src.machine_learning.configuration import MlpModelConfig
 
 config = MlpModelConfig()
 

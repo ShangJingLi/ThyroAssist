@@ -3,10 +3,10 @@ import subprocess
 import mindspore
 from mindspore import nn, context
 from mindspore.train import LossMonitor
-from src.deep_learning.dataloader import create_mlp_dataset
-from src.deep_learning.configuration import MlpModelConfig
-from src.deep_learning.networks import CellSortMlp
-from src.deep_learning.dataloader import download_and_unzip_mlp_datasets
+from src.machine_learning.dataloader import create_mlp_dataset
+from src.machine_learning.configuration import MlpModelConfig
+from src.machine_learning.networks import CellSortMlp
+from src.machine_learning.dataloader import download_and_unzip_mlp_datasets
 
 #
 #                       _oo0oo_
