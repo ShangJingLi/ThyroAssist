@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps):
     """
     Applies three steps decay to generate learning rate array.

@@ -75,7 +75,7 @@ def train_net(train_images, train_labels):
     loss_scale = mindspore.FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
     metrics = {"acc"}
     model = mindspore.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
-                            amp_level="O3", boost_level=config.boost_mode,
+                            amp_level="O0", boost_level=config.boost_mode,
                             boost_config_dict={"grad_freeze": {"total_steps": config.epoch_size * step_size}})
     # train model
     print('========================== Starting Training ==========================')
@@ -94,10 +94,14 @@ def train_net(train_images, train_labels):
 def eval_net(val_images, val_labels):
     eval_datasets = create_dataset_with_numpy(val_images, val_labels, batch_size=1, is_train=False)
     net = resnet152()
+    metrics = {"acc"}
     params = mindspore.load_checkpoint(os.path.join("medical_resnet_checkpoints", "medical_resnet_checkpoints.ckpt"))
     mindspore.load_param_into_net(net, params)
     loss = init_loss_scale()
-    model = mindspore.Model(net, loss_fn=loss, optimizer=None, metrics={'acc'})
+    lr = 0.001
+    # define opt
+    opt = nn.Adam(params=net.trainable_params(), learning_rate=lr)
+    model = mindspore.Model(net, loss_fn=loss, optimizer=opt,metrics=metrics, boost_level=config.boost_mode)
 
     acc = model.eval(eval_datasets, None, False)
     print(acc)
@@ -112,7 +116,7 @@ if __name__ == '__main__':
         pass
     train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
     train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
-    val_images = np.load(os.path.join("padding_datasets", "val_images_1.npy"))
-    val_labels = np.load(os.path.join("padding_datasets", "val_labels_1.npy"))
+    val_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
+    val_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
     train_net(train_images, train_labels)
     eval_net(val_images, val_labels)

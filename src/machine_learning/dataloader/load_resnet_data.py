@@ -28,15 +28,46 @@ def boundary_padding(origin_images:np.array, aim_size:tuple, padding:int):
         return processed_image
 
 
-def generate_images_and_labels(images_a:np.array, images_b:np.array, val_num:int):
-    train_images = np.concatenate((images_a[:-val_num//2, :, :, :],
-                                   images_b[:(val_num - val_num // 2), :, :, :]), axis=0)
-    train_labels = np.concatenate((np.tile(np.array([1, 0]), reps=(images_a.shape[0] - val_num//2, 1)),
-                                   np.tile(np.array([0, 1]), reps=(images_b.shape[0] - (val_num - val_num // 2), 1))))
-    val_images = np.concatenate((images_a[-val_num//2:, :, :, :],
-                                   images_b[(val_num - val_num // 2):, :, :, :]), axis=0)
-    val_labels = np.concatenate((np.tile(np.array([1, 0]), reps=(val_num // 2, 1)),
-                                   np.tile(np.array([0, 1]), reps=(val_num - val_num // 2, 1))))
+def convert_to_numpy(images_path):
+    # 过滤出所有的jpg文件（忽略大小写）
+    class_a_files = [file for file in os.listdir(os.path.join(images_path, "A")) if file.lower().endswith('.jpg')]
+    class_b_files = [file for file in os.listdir(os.path.join(images_path, "B")) if file.lower().endswith('.jpg')]
+
+    images_a = np.zeros(shape=(len(class_a_files), 572, 572, 3), dtype=np.uint8)
+    images_b = np.zeros(shape=(len(class_b_files), 572, 572, 3), dtype=np.uint8)
+
+    flag = 0
+
+    for i in range(len(class_a_files)):
+        flag += 1
+        image = cv2.imread(os.path.join(images_path, "A", class_a_files[i]))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = boundary_padding(image, (572, 572), padding=255)
+        images_a[i] = image
+        if flag % 20 == 0:
+            print(flag)
+
+    for i in range(len(class_b_files)):
+        flag += 1
+        image = cv2.imread(os.path.join(images_path, "B", class_b_files[i]))
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = boundary_padding(image, (572, 572), padding=255)
+        images_b[i] = image
+        if flag % 20 == 0:
+            print(flag)
+
+    return images_a, images_b
+
+
+def generate_images_and_labels(images_a:np.array, images_b:np.array):
+    train_images = np.concatenate((images_a[:-50, :, :, :],
+                                   images_b[:-50, :, :, :]), axis=0)
+    train_labels = np.concatenate((np.tile(np.array([1, 0]), reps=(images_a.shape[0] - 50, 1)),
+                                   np.tile(np.array([0, 1]), reps=(images_b.shape[0] - 50, 1))))
+    val_images = np.concatenate((images_a[-50:, :, :, :],
+                                   images_b[-50:, :, :, :]), axis=0)
+    val_labels = np.concatenate((np.tile(np.array([1, 0]), reps=(50, 1)),
+                                   np.tile(np.array([0, 1]), reps=(50, 1))))
 
     return train_images, train_labels, val_images, val_labels
 
@@ -92,4 +123,5 @@ def create_dataset_with_numpy(images, labels, batch_size, is_train):
 
 __all__ = ["create_dataset_with_numpy",
            "generate_images_and_labels",
-           "boundary_padding"]
+           "boundary_padding",
+           "convert_to_numpy"]
