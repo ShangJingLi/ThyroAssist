@@ -2,7 +2,6 @@ import os
 import subprocess
 import signal
 import sys
-import cv2
 import numpy as np
 import gradio as gr
 from src.machine_learning.dataloader import download_pathological_images, boundary_padding
@@ -71,7 +70,7 @@ signal.signal(signal.SIGTERM, on_terminate)
 
 # 判断是否下载推理用图片
 current_directory = os.getcwd()
-image_path = os.path.join(current_directory, 'ultrasound_images_to_show')
+image_path = os.path.join(current_directory, 'pathological_images_to_show')
 if not os.path.exists(image_path):
     download_pathological_images()
 
@@ -144,7 +143,7 @@ def infer_pathological_image(image):
             acl.rt.set_context(acl_resource.context)
         input_array = np.expand_dims(image.astype(np.float32).transpose((2, 0, 1)), axis=0) / 127.5 - 1
         result = model.execute([input_array])
-        if result[0][0] > result[0][1]:
+        if result[0][0][0] > result[0][0][1]:
             text = "图像中的细胞为癌细胞"
         else:
             text = "图像中的细胞为正常细胞"
