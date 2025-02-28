@@ -1,4 +1,5 @@
 import os
+import zipfile
 import joblib
 import cv2
 import openi
@@ -6,6 +7,21 @@ from skimage import color, feature
 
 def download_svm_model():
     openi.download_model(repo_id="enter/nodule_segmentation", model_name="svm_models", save_path=".")
+    zip_file_path = "svm_models.zip"
+    # 检查ZIP文件是否存在
+    if os.path.exists(zip_file_path):
+        # 使用with语句打开ZIP文件，确保文件正确关闭
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            # 解压ZIP文件到当前目录
+            zip_ref.extractall('.')
+
+        # 解压完成后删除ZIP文件
+        os.remove(zip_file_path)
+        print(f'文件 {zip_file_path} 已解压并删除。')
+    else:
+        print(f'文件 {zip_file_path} 不存在。')
+
+    print('数据集下载和解压已完成')
 
 # 1. 加载训练好的模型和标准化器
 def load_svm_model(model_filename:str, scaler_filename:str):

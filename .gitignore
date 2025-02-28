@@ -12,6 +12,7 @@ flagged/
 kernel_meta/
 ultrasound_images_to_show/
 svm_models/
+padding_datasets/
 train_images.npy
 val_images.npy
 train_masks.npy

@@ -1,5 +1,6 @@
 import mindspore
-from mindspore import nn
+from mindspore import nn, ops, Tensor
+from mindspore.nn import LossBase
 import mindspore.common.dtype as mstype
 import mindspore.ops.operations as F
 from mindspore.ops import functional as F2
@@ -90,5 +91,23 @@ class MultiCrossEntropyWithLogits(nn.Cell):
         return total_loss
 
 
+class CrossEntropySmooth(LossBase):
+    """CrossEntropy"""
+    def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
+        super(CrossEntropySmooth, self).__init__()
+        self.onehot = ops.OneHot()
+        self.sparse = sparse
+        self.on_value = Tensor(1.0 - smooth_factor, mindspore.float32)
+        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mindspore.float32)
+        self.ce = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
+
+    def construct(self, logit, label):
+        if self.sparse:
+            label = self.onehot(label, ops.shape(logit)[1], self.on_value, self.off_value)
+        loss = self.ce(logit, label)
+        return loss
+
+
 __all__ = ['CrossEntropyWithLogits',
-           'MultiCrossEntropyWithLogits']
+           'MultiCrossEntropyWithLogits',
+           'CrossEntropySmooth']
