@@ -62,7 +62,7 @@ def set_ascend_max_device_memory():
         mindspore.set_context(max_device_memory=config.max_device_memory)
 
 
-def train_net(train_images, train_labels, val_images, val_labels):
+def train_net(train_images, train_labels):
     """train net"""
     train_datasets = create_dataset_with_numpy(images=train_images, labels=train_labels, batch_size=16, is_train=True)
     net = resnet152(class_num=2)
@@ -91,20 +91,28 @@ def train_net(train_images, train_labels, val_images, val_labels):
         pass
     mindspore.save_checkpoint(model.train_network, os.path.join(target_directory, 'medical_resnet_checkpoints.ckpt'))
 
+def eval_net(val_images, val_labels):
     eval_datasets = create_dataset_with_numpy(val_images, val_labels, batch_size=1, is_train=False)
-    acc = model.eval(eval_datasets, None, True)
+    net = resnet152()
+    params = mindspore.load_checkpoint(os.path.join("medical_resnet_checkpoints", "medical_resnet_checkpoints.ckpt"))
+    mindspore.load_param_into_net(net, params)
+    loss = init_loss_scale()
+    model = mindspore.Model(net, loss_fn=loss, optimizer=None, metrics={'acc'})
+
+    acc = model.eval(eval_datasets, None, False)
     print(acc)
 
 
 if __name__ == '__main__':
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
-    if not os.path.exists('datasets_as_numpy'):
+    if not os.path.exists('padding_datasets'):
         download_and_unzip_resnet_datasets()
     else:
         pass
     train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
     train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
-    val_images = np.load(os.path.join("padding_datasets", "val_images.npy"))
-    val_labels = np.load(os.path.join("padding_datasets", "val_labels.npy"))
-    train_net(train_images, train_labels, val_images, val_labels)
+    val_images = np.load(os.path.join("padding_datasets", "val_images_1.npy"))
+    val_labels = np.load(os.path.join("padding_datasets", "val_labels_1.npy"))
+    train_net(train_images, train_labels)
+    eval_net(val_images, val_labels)
