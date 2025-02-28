@@ -116,7 +116,7 @@ if __name__ == '__main__':
         pass
     train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
     train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
-    val_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
-    val_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
+    val_images = np.load(os.path.join("padding_datasets", "val_images.npy"))
+    val_labels = np.load(os.path.join("padding_datasets", "val_labels.npy"))
     train_net(train_images, train_labels)
     eval_net(val_images, val_labels)
