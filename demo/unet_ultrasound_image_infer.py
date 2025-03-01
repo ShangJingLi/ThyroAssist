@@ -169,7 +169,7 @@ iface = gr.Interface(
     fn=infer_ultrasound_image,
     inputs=input_data,
     outputs=output_data,
-    title="基于UNet++的甲状腺超声结节区域检测器",
+    title="基于UNet的甲状腺超声结节区域检测器",
     description="选择甲状腺超声图像，通过图像分割和轮廓检测确定结节区域。"
 )
 

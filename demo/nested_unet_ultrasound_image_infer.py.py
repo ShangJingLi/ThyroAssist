@@ -243,8 +243,8 @@ def infer_ultrasound_image(image):
     return result_image, result
 
 with gr.Blocks(css=css) as demo:
-    gr.Markdown("<h1 style='text-align: center;'>图像分割与阈值处理工具</h1>")
-    gr.Markdown("### 上传病理图片后，调整阈值以获得分割结果。")
+    gr.Markdown("<h1 style='text-align: center;'>基于UNet++的甲状腺超声检测器</h1>")
+    gr.Markdown("### 上传超声影像，获取结节区域信息和诊断建议。")
     gr.Markdown("---")
     with gr.Row():
         # 给图片组件设置自定义 CSS ID

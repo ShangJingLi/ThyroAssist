@@ -162,7 +162,7 @@ def infer_pathological_image(image):
     return text
 
 # 定义Interface对象的输入输出类型
-input_data = gr.Image(label='请输入甲状腺超声图像')
+input_data = gr.Image(label='请输入显微镜下甲状腺上皮细胞影像')
 output_data = gr.Textbox(label="模型预测结果", interactive=False, lines=1)
 
 iface = gr.Interface(
