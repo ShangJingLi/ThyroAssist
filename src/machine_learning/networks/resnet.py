@@ -1,8 +1,7 @@
 import math
 import numpy as np
 from scipy.stats import truncnorm
-import mindspore.nn as nn
-import mindspore.ops as ops
+from mindspore import nn, ops
 import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
 from src.machine_learning.resnet_configuration import config

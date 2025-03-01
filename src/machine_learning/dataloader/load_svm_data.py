@@ -3,7 +3,7 @@ import zipfile
 import joblib
 import cv2
 import openi
-from skimage import color, feature
+from skimage import feature
 
 def download_svm_model():
     openi.download_model(repo_id="enter/nodule_segmentation", model_name="svm_models", save_path=".")

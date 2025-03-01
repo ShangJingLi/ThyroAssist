@@ -1,6 +1,6 @@
+import os
 import cv2
 import numpy as np
-import os
 import joblib
 from sklearn import svm
 from sklearn.model_selection import train_test_split

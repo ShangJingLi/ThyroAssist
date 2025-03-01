@@ -2,6 +2,8 @@ import os
 import subprocess
 import signal
 import sys
+
+import cv2
 import numpy as np
 import gradio as gr
 from src.machine_learning.dataloader import download_pathological_images, boundary_padding
@@ -136,6 +138,7 @@ else:
 # 定义gradio的Interface类
 def infer_pathological_image(image):
     image = boundary_padding(image, aim_size=(572, 572), padding=255)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
     if USE_ORANGE_PI:
         context, _ = acl.rt.get_context()

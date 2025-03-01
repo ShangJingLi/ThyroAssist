@@ -39,22 +39,17 @@ def convert_to_numpy(images_path):
     flag = 0
 
     for i in range(len(class_a_files)):
-        flag += 1
-        image = cv2.imread(os.path.join(images_path, "A", class_a_files[i]))
+        image = cv2.imread(os.path.join(images_path, "A", f"A{i+1}.jpg"))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = boundary_padding(image, (572, 572), padding=255)
         images_a[i] = image
-        if flag % 20 == 0:
-            print(flag)
 
     for i in range(len(class_b_files)):
         flag += 1
-        image = cv2.imread(os.path.join(images_path, "B", class_b_files[i]))
+        image = cv2.imread(os.path.join(images_path, "B", f"B{i+1}.jpg"))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = boundary_padding(image, (572, 572), padding=255)
         images_b[i] = image
-        if flag % 20 == 0:
-            print(flag)
 
     return images_a, images_b
 

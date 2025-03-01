@@ -62,7 +62,7 @@ def parse_yaml(yaml_path):
     with open(yaml_path, 'r') as fin:
         try:
             cfgs = yaml.load_all(fin.read(), Loader=yaml.FullLoader)
-            cfgs = [x for x in cfgs]
+            cfgs = list(cfgs)
             if len(cfgs) == 1:
                 cfg_helper = {}
                 cfg = cfgs[0]

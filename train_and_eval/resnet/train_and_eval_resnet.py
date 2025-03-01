@@ -64,7 +64,7 @@ def set_ascend_max_device_memory():
 
 def train_net(train_images, train_labels):
     """train net"""
-    train_datasets = create_dataset_with_numpy(images=train_images, labels=train_labels, batch_size=16, is_train=True)
+    train_datasets = create_dataset_with_numpy(images=train_images, labels=train_labels, batch_size=12, is_train=True)
     net = resnet152(class_num=2)
 
     step_size = train_datasets.get_dataset_size()
