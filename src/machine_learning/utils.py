@@ -1,5 +1,7 @@
 import time
 import mindspore
+import numpy as np
+from mindspore import nn
 
 
 class StopTimeMonitor(mindspore.Callback):
@@ -94,9 +96,17 @@ def is_gpu_available():
         return False
 
 
+def export_ms_model(net:nn.Cell, model_name:str, input_shape:tuple,checkpoint_file_path:str, file_format:str):
+    params = mindspore.load_checkpoint(checkpoint_file_path)
+    mindspore.load_param_into_net(net, params)
+    input_tensor = mindspore.Tensor(np.ones(shape=input_shape, dtype=np.float32))
+    mindspore.export(net, input_tensor, file_name=model_name, file_format=file_format)
+
+
 __all__ = ['get_time',
            'split_ckpt',
            'restore_ckpt',
            'StopTimeMonitor',
            'is_gpu_available',
-           'is_ascend_available']
+           'is_ascend_available',
+           'export_ms_model']
