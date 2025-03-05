@@ -2,12 +2,21 @@ import os
 import subprocess
 import signal
 import sys
-
 import cv2
 import numpy as np
 import gradio as gr
 from src.machine_learning.dataloader import download_pathological_images, boundary_padding
 from src.machine_learning.utils import is_ascend_available, is_gpu_available
+
+
+my_theme = gr.themes.Soft(
+    primary_hue="blue",
+    secondary_hue="cyan",
+    neutral_hue="gray",
+    text_size="md",
+    spacing_size="md",
+    radius_size="md"
+)
 
 
 USE_ORANGE_PI = False
@@ -166,6 +175,7 @@ input_data = gr.Image(label='请输入显微镜下甲状腺上皮细胞影像')
 output_data = gr.Textbox(label="模型预测结果", interactive=False, lines=1)
 
 iface = gr.Interface(
+    theme=my_theme,
     fn=infer_pathological_image,
     inputs=input_data,
     outputs=output_data,

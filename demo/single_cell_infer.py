@@ -15,6 +15,16 @@ from src.machine_learning.networks import CellSortMlp
    数据尺度要求：0.25 微米/像素"""
 
 
+my_theme = gr.themes.Soft(
+    primary_hue="blue",
+    secondary_hue="cyan",
+    neutral_hue="gray",
+    text_size="md",
+    spacing_size="md",
+    radius_size="md"
+)
+
+
 MEAN = np.array([5.12456848e+01, 8.54135088e+01, 1.42719344e+01, 7.80080000e+01,
                   5.5712e+01, 1.402496e+02, 2.63336016e+01, 8.94158400e-01,
                   9.14244480e+00, 8.27600000e+01, 1.19590080e+03, 1.06849920e+03,

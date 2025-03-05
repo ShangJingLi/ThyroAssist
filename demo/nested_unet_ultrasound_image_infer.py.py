@@ -11,12 +11,16 @@ from src.machine_learning.dataloader import (download_ultrasound_images,
                                              extract_features_from_image)
 from src.machine_learning.utils import is_ascend_available, is_gpu_available
 
-css = """
-#image_input_container {
-    max-width: 600px;
-    margin: auto;
-}
-"""
+
+my_theme = gr.themes.Soft(
+    primary_hue="blue",
+    secondary_hue="cyan",
+    neutral_hue="gray",
+    text_size="md",
+    spacing_size="md",
+    radius_size="md"
+)
+
 
 if not os.path.exists("svm_models"):
     download_svm_model()
@@ -242,7 +246,7 @@ def infer_ultrasound_image(image):
                f"后者{advice2}")
     return result_image, result
 
-with gr.Blocks(css=css) as demo:
+with gr.Blocks(theme=my_theme) as demo:
     gr.Markdown("<h1 style='text-align: center;'>基于UNet++的甲状腺超声检测器</h1>")
     gr.Markdown("### 上传超声影像，获取结节区域信息和诊断建议。")
     gr.Markdown("---")
