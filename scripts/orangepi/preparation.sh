@@ -25,7 +25,7 @@ fi
 
 if ! conda env list | grep -q mindspore; then
     # 如果不存在，则创建名为mindspore环境，并设置重启shell后自启动该环境
-    conda create -n mindspore python=3.9 -y
+    conda create -n mindspore python=3.11 -y
     echo "conda activate mindspore" >> ~/.bashrc
     echo "mindspore环境已创建。"
 else
