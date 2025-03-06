@@ -114,4 +114,4 @@ with gr.Blocks(css=css) as demo:
                         error_output],  # 清空错误信息
         )
 
-demo.launch()
+demo.launch(inbrowser=True)

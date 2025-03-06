@@ -8,8 +8,12 @@ from src.machine_learning.resnet_configuration import config
 from src.machine_learning.networks import resnet152
 from src.machine_learning import lr_generator
 from src.machine_learning.loss import CrossEntropySmooth
-from src.machine_learning.dataloader.load_resnet_data import create_dataset_with_numpy
+from src.machine_learning.dataloader.load_resnet_data import (create_dataset_with_numpy,
+                                                              convert_to_numpy,
+                                                              generate_images_and_labels,
+                                                              )
 from src.machine_learning.dataloader.download_resnet_data import download_and_unzip_resnet_datasets
+
 
 USE_ORANGE_PI = False
 mindspore.set_seed(1)
@@ -62,9 +66,16 @@ def set_ascend_max_device_memory():
         mindspore.set_context(max_device_memory=config.max_device_memory)
 
 
-def train_net(train_images, train_labels):
+def create_datasets(images_path, method, padding=None, aim_size=(572, 572)):
+    images_a, images_b = convert_to_numpy(images_path, method=method, padding=padding, aim_size=aim_size)
+    train_images, train_labels, val_images, val_labels = generate_images_and_labels(images_a, images_b)
+    return train_images, train_labels, val_images, val_labels
+
+
+
+def train_net(train_images, train_labels, batch_size, method):
     """train net"""
-    train_datasets = create_dataset_with_numpy(images=train_images, labels=train_labels, batch_size=12, is_train=True)
+    train_datasets = create_dataset_with_numpy(images=train_images, labels=train_labels, batch_size=batch_size, is_train=True)
     net = resnet152(class_num=2)
 
     step_size = train_datasets.get_dataset_size()
@@ -84,18 +95,18 @@ def train_net(train_images, train_labels):
     print('========================== Training Ended ==========================')
 
     current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'medical_resnet_checkpoints')
+    target_directory = os.path.join(current_directory, f'medical_resnet_checkpoints({method})')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:
         pass
     mindspore.save_checkpoint(model.train_network, os.path.join(target_directory, 'medical_resnet_checkpoints.ckpt'))
 
-def eval_net(val_images, val_labels):
+def eval_net(val_images, val_labels, method):
     eval_datasets = create_dataset_with_numpy(val_images, val_labels, batch_size=1, is_train=False)
     net = resnet152()
     metrics = {"acc"}
-    params = mindspore.load_checkpoint(os.path.join("medical_resnet_checkpoints", "medical_resnet_checkpoints.ckpt"))
+    params = mindspore.load_checkpoint(os.path.join(f"medical_resnet_checkpoints({method})", "medical_resnet_checkpoints.ckpt"))
     mindspore.load_param_into_net(net, params)
     loss = init_loss_scale()
     lr = 0.001
@@ -110,13 +121,34 @@ def eval_net(val_images, val_labels):
 if __name__ == '__main__':
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
-    if not os.path.exists('padding_datasets'):
-        download_and_unzip_resnet_datasets()
+
+    use_custom_datasets = False
+    custom_datasets_path = None
+    batch_size = 16
+
+    method = "pad"
+    if not use_custom_datasets:
+        if method == "pad":
+            if not (os.path.exists('padding_datasets')):
+                download_and_unzip_resnet_datasets(method="pad")
+            train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
+            train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
+            val_images = np.load(os.path.join("padding_datasets", "val_images.npy"))
+            val_labels = np.load(os.path.join("padding_datasets", "val_labels.npy"))
+        else:
+            if not (os.path.exists('crop_datasets')):
+                download_and_unzip_resnet_datasets(method="crop")
+            train_images = np.load(os.path.join("crop_datasets", "train_images.npy"))
+            train_labels = np.load(os.path.join("crop_datasets", "train_labels.npy"))
+            val_images = np.load(os.path.join("crop_datasets", "val_images.npy"))
+            val_labels = np.load(os.path.join("crp[_datasets", "val_labels.npy"))
+        train_net(train_images, train_labels, batch_size=16, method=method)
+        eval_net(val_images, val_labels)
+
     else:
-        pass
-    train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
-    train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
-    val_images = np.load(os.path.join("padding_datasets", "val_images.npy"))
-    val_labels = np.load(os.path.join("padding_datasets", "val_labels.npy"))
-    train_net(train_images, train_labels)
-    eval_net(val_images, val_labels)
+        images_a, images_b = convert_to_numpy(images_path=custom_datasets_path, method=method)
+        train_images, train_labels, val_images, val_labels = generate_images_and_labels(images_a,
+                                                                                        images_b,
+                                                                                        batch_size=batch_size)
+        train_net(train_images, train_labels, batch_size=batch_size, method=method)
+        eval_net(val_images, val_labels, method=method)

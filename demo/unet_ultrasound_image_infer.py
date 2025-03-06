@@ -173,4 +173,4 @@ iface = gr.Interface(
     description="选择甲状腺超声图像，通过图像分割和轮廓检测确定结节区域。"
 )
 
-iface.launch()
+iface.launch(inbrowser=True)

@@ -183,4 +183,4 @@ iface = gr.Interface(
     description="选择显微镜下甲状腺上皮细胞图片，通过模型预测是否癌变。"
 )
 
-iface.launch()
+iface.launch(inbrowser=True)

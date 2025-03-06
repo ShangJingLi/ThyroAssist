@@ -273,4 +273,4 @@ with gr.Blocks(theme=my_theme) as demo:
             components=[image_input, image_output, text_output],  # 清空错误信息
         )
 
-demo.launch()
+demo.launch(inbrowser=True)

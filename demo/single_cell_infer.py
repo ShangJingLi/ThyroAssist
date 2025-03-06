@@ -116,4 +116,4 @@ iface = gr.Interface(
     description="上传特征文件，检测细胞是否属于癌细胞"
 )
 
-iface.launch()
+iface.launch(inbrowser=True)
