@@ -143,7 +143,7 @@ if __name__ == '__main__':
             val_images = np.load(os.path.join("crop_datasets", "val_images.npy"))
             val_labels = np.load(os.path.join("crp[_datasets", "val_labels.npy"))
         train_net(train_images, train_labels, batch_size=16, method=method)
-        eval_net(val_images, val_labels)
+        eval_net(val_images, val_labels, method=method)
 
     else:
         images_a, images_b = convert_to_numpy(images_path=custom_datasets_path, method=method)

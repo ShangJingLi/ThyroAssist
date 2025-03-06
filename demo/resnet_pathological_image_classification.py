@@ -18,7 +18,7 @@ my_theme = gr.themes.Soft(
     radius_size="md"
 )
 
-
+method='pad'
 USE_ORANGE_PI = False
 
 # 后端类型判断及context设置
@@ -131,13 +131,13 @@ if USE_ORANGE_PI:
     acl_resource.init()
     model_path = os.path.join(current_directory, "medical_resnet.om")
     if not os.path.exists(model_path):
-        download_resnet_om()
+        download_resnet_om(method=method)
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
     ckpt_path = os.path.join(current_directory, 'medical_resnet_checkpoints')
     if not os.path.exists(ckpt_path):
-        download_and_unzip_resnet_checkpoints()
+        download_and_unzip_resnet_checkpoints(method=method)
     ckpt_file = os.path.join(ckpt_path, 'medical_resnet_checkpoints.ckpt')
 
     net = resnet152()
