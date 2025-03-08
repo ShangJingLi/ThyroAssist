@@ -88,7 +88,7 @@ def _generate_poly_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps):
         else:
             base = (1.0 - (float(i) - float(warmup_steps)) / (float(total_steps) - float(warmup_steps)))
             lr = float(lr_max) * base * base
-            lr = min(lr, 0.0)
+            lr = max(lr, 1e-5)
         lr_each_step.append(lr)
     return lr_each_step[start_steps:]
 

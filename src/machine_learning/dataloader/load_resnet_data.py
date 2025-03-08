@@ -54,14 +54,16 @@ def center_crop(origin_images:np.array, aim_size:tuple=(572, 572)):
     if origin_images.ndim == 4:
         processed_images = np.ones(shape=(origin_images.shape[0], aim_size[0], aim_size[1], 3), dtype=np.uint8)
         k = origin_images.shape[2] / origin_images.shape[1]
-        if k > 1:
+        if k > 1:  # k:宽 / 高
             for i in range(origin_images.shape[0]):
                 image = cv2.resize(origin_images[i], dsize=(int(k * aim_size[0]), aim_size[0]))
-                processed_images[i] = image[:, int((k - 1) * aim_size[0]): int((k - 1) * aim_size[0]) + aim_size[0], :]
+                processed_images[i] = image[:, int(0.5 * (k - 1) * aim_size[0]):
+                                               int(0.5 * (k - 1) * aim_size[0]) + aim_size[0], :]
         else:
             for i in range(origin_images.shape[0]):
                 image = cv2.resize(origin_images[i], dsize=(aim_size[1], int(aim_size[1] / k)))
-                processed_images[i] = image[int((1 - k) * aim_size[1]): int((1 - k) * aim_size[1]) + aim_size[1], :, :]
+                processed_images[i] = image[int(0.5 * (1 / k - 1) * aim_size[1]):
+                                            int(0.5 * (1 / k - 1) * aim_size[1]) + aim_size[1], :, :]
 
         return processed_images
 
@@ -69,10 +71,13 @@ def center_crop(origin_images:np.array, aim_size:tuple=(572, 572)):
         k = origin_images.shape[1] / origin_images.shape[0]
         if k > 1:
             image = cv2.resize(origin_images, dsize=(int(k * aim_size[0]), aim_size[0]))
-            processed_image = image[:, (k - 1) * aim_size[0]: (k - 1) * aim_size[0] + aim_size[0], :]
+            print(int((k - 1) * aim_size[0]))
+            processed_image = image[:, int(0.5 * (k - 1) * aim_size[0]):
+                                       int(0.5 * (k - 1) * aim_size[0]) + aim_size[0], :]
         else:
             image = cv2.resize(origin_images, dsize=(aim_size[1], int(aim_size[1] / k)))
-            processed_image = image[int((1 - k) * aim_size[1]): int((1 - k) * aim_size[1]) + aim_size[1], :]
+            processed_image = image[int(0.5 * (1 / k - 1) * aim_size[1]):
+                                    int(0.5 * (1 / k - 1) * aim_size[1]) + aim_size[1], :]
 
         return processed_image
 

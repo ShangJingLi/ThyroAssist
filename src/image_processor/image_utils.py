@@ -247,6 +247,32 @@ def watershed_algorthm(image):
     return copy_image
 
 
+def random_flip(image):
+    """随机翻转"""
+    flip_code = np.random.choice([-1, 0, 1])  # -1: 水平+垂直翻转, 0: 垂直翻转, 1: 水平翻转
+    return cv2.flip(image, flip_code)
+
+
+def random_rotate(image, angle_range=30):
+    """随机旋转"""
+    h, w = image.shape[:2]
+    angle = np.random.uniform(-angle_range, angle_range)
+    M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
+    return cv2.warpAffine(image, M, (w, h))
+
+def random_brightness(image, alpha_range=(0.7, 1.3)):
+    """随机调整亮度"""
+    alpha = np.random.uniform(alpha_range[0], alpha_range[1])  # 亮度调整因子
+    return np.clip(image * alpha, 0, 255).astype(np.uint8)
+
+
+def random_channel_swap(image):
+    """随机调换通道"""
+    channels = [0, 1, 2]
+    np.random.shuffle(channels)
+    return image[:, :, channels]
+
+
 __all__ = ['segmentation_by_threshold',
            'cells_segmentation',
            'std_cleaner',
@@ -254,4 +280,8 @@ __all__ = ['segmentation_by_threshold',
            'get_time',
            'rename_jpg_files',
            'download_pathological_images',
-           'watershed_algorthm']
+           'watershed_algorthm',
+           'random_rotate',
+           'random_brightness',
+           'random_flip',
+           'random_channel_swap']
