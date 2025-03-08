@@ -171,7 +171,7 @@ def infer_pathological_image(image):
     return text
 
 # 定义Interface对象的输入输出类型
-input_data = gr.Image(label='请输入显微镜下甲状腺上皮细胞影像')
+input_data = gr.Image(label='请输入显微镜下甲状腺结节穿刺细胞影像')
 output_data = gr.Textbox(label="模型预测结果", interactive=False, lines=1)
 
 iface = gr.Interface(
@@ -179,8 +179,8 @@ iface = gr.Interface(
     fn=infer_pathological_image,
     inputs=input_data,
     outputs=output_data,
-    title="基于ResNet152的甲状腺上皮细胞分类器",
-    description="选择显微镜下甲状腺上皮细胞图片，通过模型预测是否癌变。"
+    title="基于ResNet152的甲状腺细针穿刺细胞分类器",
+    description="选择显微镜下甲状腺细针穿刺细胞图片，通过模型预测是否癌变。"
 )
 
 iface.launch(inbrowser=True)
