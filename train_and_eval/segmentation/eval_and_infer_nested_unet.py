@@ -7,12 +7,12 @@ import cv2
 import mindspore
 from mindspore import nn, context
 from mindspore import Model, Tensor
-from src.machine_learning.dataloader import (create_segmentation_dataset_at_numpy,
-                                             download_and_unzip_nested_unet_checkpoints,
-                                             download_and_unzip_segmentation_datasets)
-from src.machine_learning.networks import NestedUNet
-from src.machine_learning.utils import get_time
-from src.machine_learning.configuration import NestedUNetConfig
+from thyassist.machine_learning.dataloader import (create_segmentation_dataset_at_numpy,
+                                                   download_and_unzip_nested_unet_checkpoints,
+                                                   download_and_unzip_segmentation_datasets)
+from thyassist.machine_learning.networks import NestedUNet
+from thyassist.machine_learning.utils import get_time
+from thyassist.machine_learning.configuration import NestedUNetConfig
 from launcher import get_project_root
 
 

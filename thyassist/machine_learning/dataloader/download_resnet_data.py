@@ -74,16 +74,16 @@ def download_resnet_om(method:str):
 
 def download_pathological_images():
     openi.download_file(repo_id="enter/nodule_segmentation", file="pathological_images_to_show.zip", cluster="NPU",
-                        save_path=download_dir,
+                        save_path=os.getcwd(),
                         force=False)
-    zip_file_path = os.path.join(download_dir, 'pathological_images_to_show.zip')
+    zip_file_path = os.path.join(os.getcwd(), 'pathological_images_to_show.zip')
 
     # 检查ZIP文件是否存在
     if os.path.exists(zip_file_path):
         # 使用with语句打开ZIP文件，确保文件正确关闭
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             # 解压ZIP文件到当前目录
-            zip_ref.extractall(download_dir)
+            zip_ref.extractall(os.getcwd())
 
         # 解压完成后删除ZIP文件
         os.remove(zip_file_path)

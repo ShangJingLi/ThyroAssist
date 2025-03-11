@@ -4,15 +4,15 @@ import numpy as np
 import mindspore
 from mindspore import nn, context
 import mindspore.log as logger
-from src.machine_learning.resnet_configuration import config
-from src.machine_learning.networks import resnet152
-from src.machine_learning import lr_generator
-from src.machine_learning.loss import CrossEntropySmooth
-from src.machine_learning.dataloader.load_resnet_data import (create_dataset_with_numpy,
-                                                              convert_to_numpy,
-                                                              generate_images_and_labels,
-                                                              )
-from src.machine_learning.dataloader.download_resnet_data import download_and_unzip_resnet_datasets
+from thyassist.machine_learning.resnet_configuration import config
+from thyassist.machine_learning.networks import resnet152
+from thyassist.machine_learning import lr_generator
+from thyassist.machine_learning.loss import CrossEntropySmooth
+from thyassist.machine_learning.dataloader.load_resnet_data import (create_dataset_with_numpy,
+                                                                    convert_to_numpy,
+                                                                    generate_images_and_labels,
+                                                                    )
+from thyassist.machine_learning.dataloader.download_resnet_data import download_and_unzip_resnet_datasets
 from launcher import get_project_root
 
 
@@ -35,7 +35,7 @@ else:
 def init_lr(step_size):
     """init lr"""
     if config.optimizer == "Thor":
-        from src.machine_learning.lr_generator import get_thor_lr
+        from thyassist.machine_learning.lr_generator import get_thor_lr
         lr = get_thor_lr(config.start_epoch * step_size, config.lr_init, config.lr_decay, config.lr_end_epoch,
                          step_size, decay_epochs=39)
     else:

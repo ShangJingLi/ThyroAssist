@@ -1,5 +1,5 @@
 from mindspore import nn
-from src.machine_learning.configuration import MlpModelConfig
+from thyassist.machine_learning.configuration import MlpModelConfig
 
 config = MlpModelConfig()
 

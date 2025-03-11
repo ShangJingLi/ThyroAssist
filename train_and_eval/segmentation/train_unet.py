@@ -7,10 +7,10 @@ from mindspore import nn
 from mindspore import Model
 from mindspore import context
 from mindspore.train.callback import LossMonitor
-from src.machine_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
-from src.machine_learning.networks import UNet
-from src.machine_learning.utils import get_time, StopTimeMonitor
-from src.machine_learning.configuration import UNetConfig
+from thyassist.machine_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
+from thyassist.machine_learning.networks import UNet
+from thyassist.machine_learning.utils import get_time, StopTimeMonitor
+from thyassist.machine_learning.configuration import UNetConfig
 from launcher import get_project_root
 #
 #                       _oo0oo_

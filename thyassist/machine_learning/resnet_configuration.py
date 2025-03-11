@@ -4,7 +4,7 @@ import argparse
 from pprint import pformat
 import yaml
 
-_config_path = os.path.join("src", "machine_learning", "config.yaml")
+_config_path = os.path.join("thyassist", "machine_learning", "config.yaml")
 
 class Config:
     """

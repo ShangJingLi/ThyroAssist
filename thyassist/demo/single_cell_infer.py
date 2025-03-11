@@ -8,8 +8,8 @@ import pandas as pd
 import mindspore
 from mindspore import Tensor
 from mindspore import context
-from src.machine_learning.dataloader import download_and_unzip_best_mlp_checkpoints, download_and_unzip_mlp_datasets
-from src.machine_learning.networks import CellSortMlp
+from thyassist.machine_learning.dataloader import download_and_unzip_best_mlp_checkpoints, download_and_unzip_mlp_datasets
+from thyassist.machine_learning.networks import CellSortMlp
 from launcher import get_project_root
 
 download_dir = get_project_root()

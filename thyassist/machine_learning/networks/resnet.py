@@ -4,7 +4,7 @@ from scipy.stats import truncnorm
 from mindspore import nn, ops
 import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
-from src.machine_learning.resnet_configuration import config
+from thyassist.machine_learning.resnet_configuration import config
 
 
 def conv_variance_scaling_initializer(in_channel, out_channel, kernel_size):

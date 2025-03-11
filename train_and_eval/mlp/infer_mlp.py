@@ -3,8 +3,8 @@ import subprocess
 import numpy as np
 import mindspore
 from mindspore import nn, Tensor, context
-from src.machine_learning.configuration import MlpModelConfig
-from src.machine_learning.networks import CellSortMlp
+from thyassist.machine_learning.configuration import MlpModelConfig
+from thyassist.machine_learning.networks import CellSortMlp
 from launcher import get_project_root
 
 

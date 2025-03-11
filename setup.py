@@ -1,5 +1,6 @@
 # setup.py
-from setuptools import setup
+from setuptools import setup, find_packages
+import os
 
 def read_requirements():
     with open("requirements.txt") as f:
@@ -8,11 +9,15 @@ def read_requirements():
 setup(
     name="thyroassist",
     version="0.1.0",
-    py_modules=["launcher"],  # 直接包含 launcher.py 作为模块
+    packages=find_packages(),  # 自动查找所有包
+    package_data={
+        "thyassist": ["*.yaml", "*.json", "*.txt"],  # 确保 yaml/json/txt 等文件被打包
+    },
+    include_package_data=True,  # 关键：启用包含数据文件
     install_requires=read_requirements(),
     entry_points={
         "console_scripts": [
-            "thyassist = launcher:main"  # 关键：注册全局命令
+            "thyassist = launcher:main"
         ],
     },
 )
