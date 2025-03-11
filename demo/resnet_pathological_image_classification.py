@@ -135,7 +135,7 @@ if USE_ORANGE_PI:
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(current_directory, 'medical_resnet_checkpoints')
+    ckpt_path = os.path.join(current_directory, f'medical_resnet_checkpoints({method})')
     if not os.path.exists(ckpt_path):
         download_and_unzip_resnet_checkpoints(method=method)
     ckpt_file = os.path.join(ckpt_path, 'medical_resnet_checkpoints.ckpt')

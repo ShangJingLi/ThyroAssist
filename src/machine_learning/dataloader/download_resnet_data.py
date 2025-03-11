@@ -36,10 +36,10 @@ def download_and_unzip_resnet_checkpoints(method:str):
     if method not in ["pad", "crop"]:
         raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
     if method == "pad":
-        openi.download_model(repo_id="enter/medical_resnet",model_name="medical_resnet_checkpoints(pad)",save_path=".")
+        openi.download_model(repo_id="enter/medical_resnet",model_name="medical_resnet_checkpoints_pad",save_path=".")
         zip_file_path = "medical_resnet_checkpoints(pad).zip"
     else:
-        openi.download_model(repo_id="enter/medical_resnet", model_name="medical_resnet_checkpoints(crop)", save_path=".")
+        openi.download_model(repo_id="enter/medical_resnet", model_name="medical_resnet_checkpoints_crop", save_path=".")
         zip_file_path = "medical_resnet_checkpoints(crop).zip"
 
     # 检查ZIP文件是否存在
@@ -61,7 +61,7 @@ def download_resnet_om(method:str):
     if method not in ["pad", "crop"]:
         raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
     openi.download_model(repo_id="enter/nodule_segmentation",
-                         model_name="medical_resnet",save_path=".")
+                         model_name=f"medical_resnet({method})",save_path=".")
 
     model_path = 'medical_resnet.om'
     # 检查ZIP文件是否存在
