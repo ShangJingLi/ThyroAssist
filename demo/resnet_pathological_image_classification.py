@@ -7,6 +7,7 @@ import numpy as np
 import gradio as gr
 from src.machine_learning.dataloader import download_pathological_images, boundary_padding
 from src.machine_learning.utils import is_ascend_available, is_gpu_available
+from launcher import get_project_root
 
 
 my_theme = gr.themes.Soft(
@@ -19,6 +20,7 @@ my_theme = gr.themes.Soft(
 )
 
 method='pad'
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 
 # 后端类型判断及context设置
@@ -80,8 +82,7 @@ signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
 # 判断是否下载推理用图片
-current_directory = os.getcwd()
-image_path = os.path.join(current_directory, 'pathological_images_to_show')
+image_path = os.path.join(download_dir, 'pathological_images_to_show')
 if not os.path.exists(image_path):
     download_pathological_images()
 
@@ -129,13 +130,13 @@ if USE_ORANGE_PI:
 
     acl_resource = AclLiteResource()
     acl_resource.init()
-    model_path = os.path.join(current_directory, "medical_resnet.om")
+    model_path = os.path.join(download_dir, "medical_resnet.om")
     if not os.path.exists(model_path):
         download_resnet_om(method=method)
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(current_directory, f'medical_resnet_checkpoints({method})')
+    ckpt_path = os.path.join(download_dir, f'medical_resnet_checkpoints({method})')
     if not os.path.exists(ckpt_path):
         download_and_unzip_resnet_checkpoints(method=method)
     ckpt_file = os.path.join(ckpt_path, 'medical_resnet_checkpoints.ckpt')

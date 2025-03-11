@@ -4,16 +4,20 @@ import joblib
 import cv2
 import openi
 from skimage import feature
+from launcher import get_project_root
+
+
+download_dir = get_project_root()
 
 def download_svm_model():
-    openi.download_model(repo_id="enter/nodule_segmentation", model_name="svm_models", save_path=".")
-    zip_file_path = "svm_models.zip"
+    openi.download_model(repo_id="enter/nodule_segmentation", model_name="svm_models", save_path=download_dir)
+    zip_file_path = os.path.join(download_dir, "svm_models.zip")
     # 检查ZIP文件是否存在
     if os.path.exists(zip_file_path):
         # 使用with语句打开ZIP文件，确保文件正确关闭
         with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
             # 解压ZIP文件到当前目录
-            zip_ref.extractall('.')
+            zip_ref.extractall(download_dir)
 
         # 解压完成后删除ZIP文件
         os.remove(zip_file_path)

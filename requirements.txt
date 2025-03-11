@@ -4,7 +4,7 @@ opencv-python
 opencv-contrib-python
 pandas
 openi
-mindspore>2.2.0
+mindspore>=2.2.0
 multiprocess
 requests
 gradio

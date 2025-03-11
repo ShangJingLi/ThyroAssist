@@ -7,6 +7,7 @@ from src.machine_learning.dataloader import create_mlp_dataset
 from src.machine_learning.configuration import MlpModelConfig
 from src.machine_learning.networks import CellSortMlp
 from src.machine_learning.dataloader import download_and_unzip_mlp_datasets
+from launcher import get_project_root
 
 #
 #                       _oo0oo_
@@ -32,6 +33,7 @@ from src.machine_learning.dataloader import download_and_unzip_mlp_datasets
 #     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #               佛祖保佑         永无BUG
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
@@ -47,13 +49,13 @@ else:
 
 config = MlpModelConfig()
 
-if not os.path.exists('mlp_datasets'):
+if not os.path.exists(os.path.join(download_dir, 'mlp_datasets')):
     download_and_unzip_mlp_datasets()
 else:
     pass
 
-cancer_data_path = os.path.join(r"mlp_datasets/cancer_cell.csv")
-not_caner_data_path = os.path.join(r"mlp_datasets/not_cancer_cell.csv")
+cancer_data_path = os.path.join(download_dir, "mlp_datasets", "cancer_cell.csv")
+not_caner_data_path = os.path.join(download_dir, "mlp_datasets", "not_cancer_cell.csv")
 
 train_dataset, eval_dataset = create_mlp_dataset(cancer_data_path,
                                                  not_caner_data_path)
@@ -73,7 +75,7 @@ def train_and_eval():
     metrics_result = model.eval(eval_dataset)
     print(metrics_result)
 
-    target_directory = os.path.join("mlp_checkpoints")
+    target_directory = os.path.join(download_dir, "mlp_checkpoints")
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:

@@ -5,7 +5,10 @@ import mindspore
 from mindspore import nn, Tensor, context
 from src.machine_learning.configuration import MlpModelConfig
 from src.machine_learning.networks import CellSortMlp
+from launcher import get_project_root
 
+
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
@@ -20,8 +23,7 @@ else:
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
 
 config = MlpModelConfig()
-
-ckpt_file = os.path.join("mlp_checkpoints", "mlp_model_checkpoints.ckpt")
+ckpt_file = os.path.join(download_dir, "mlp_checkpoints", "mlp_model_checkpoints.ckpt")
 net = CellSortMlp()
 params = mindspore.load_checkpoint(ckpt_file)
 mindspore.load_param_into_net(net, params)

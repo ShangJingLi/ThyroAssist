@@ -11,6 +11,7 @@ from src.machine_learning.dataloader import create_segmentation_dataset_at_numpy
 from src.machine_learning.networks import UNet
 from src.machine_learning.utils import get_time, StopTimeMonitor
 from src.machine_learning.configuration import UNetConfig
+from launcher import get_project_root
 #
 #                       _oo0oo_
 #                      o8888888o
@@ -35,7 +36,7 @@ from src.machine_learning.configuration import UNetConfig
 #     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #               佛祖保佑         永无BUG
-
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 
 mindspore.set_seed(1)
@@ -57,13 +58,13 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
 
-    if not os.path.exists('datasets_as_numpy'):
+    if not os.path.exists(os.path.join(download_dir, 'datasets_as_numpy')):
         download_and_unzip_segmentation_datasets()
     else:
         pass
 
-    train_images = np.load(os.path.join("datasets_as_numpy", "train_images.npy"))
-    train_masks = np.load(os.path.join("datasets_as_numpy", "train_masks.npy"))
+    train_images = np.load(os.path.join(download_dir, "datasets_as_numpy", "train_images.npy"))
+    train_masks = np.load(os.path.join(download_dir, "datasets_as_numpy", "train_masks.npy"))
     train_dataset = create_segmentation_dataset_at_numpy(train_images, train_masks,
                                                          img_size=config.image_size,
                                                          mask_size=config.mask_size,
@@ -81,10 +82,9 @@ def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=con
                   optimizer=optimizer, metrics={"Dice系数": nn.Dice()}, amp_level='O0')  # nn.Accuracy
     print("============ Starting Training ============")
     start_time = time.time()
-    model.train(epoch, train_dataset, callbacks=[LossMonitor(1), StopTimeMonitor(12600)],
+    model.train(epoch, train_dataset, callbacks=[LossMonitor(1), StopTimeMonitor(12600), early_stop],
                 dataset_sink_mode=True)
-    current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, 'unet_checkpoints')
+    target_directory = os.path.join(download_dir, 'unet_checkpoints')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:

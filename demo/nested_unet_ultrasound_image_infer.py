@@ -10,8 +10,10 @@ from src.machine_learning.dataloader import (download_ultrasound_images,
                                              load_svm_model,
                                              extract_features_from_image)
 from src.machine_learning.utils import is_ascend_available, is_gpu_available
+from launcher import get_project_root
 
 
+download_dir = get_project_root()
 my_theme = gr.themes.Soft(
     primary_hue="blue",
     secondary_hue="cyan",
@@ -22,17 +24,23 @@ my_theme = gr.themes.Soft(
 )
 
 
-if not os.path.exists("svm_models"):
+if not os.path.exists(os.path.join(download_dir, "svm_models")):
     download_svm_model()
 else:
     pass
 
-judge_echo_intensity_model , judge_echo_intensity_scaler = load_svm_model(os.path.join("svm_models", "judge_echo_intensity_model.pkl"),
-                                                                          os.path.join("svm_models", "judge_echo_intensity_scaler.pkl"))
-judge_microcalcification_model, judge_microcalcification_scaler = load_svm_model(os.path.join("svm_models", "judge_microcalcification_model.pkl"),
-                                                                          os.path.join("svm_models", "judge_microcalcification_scaler.pkl"))
-judge_solidity_model, judge_solidity_scaler = load_svm_model(os.path.join("svm_models", "judge_solidity_model.pkl"),
-                                                                          os.path.join("svm_models", "judge_solidity_scaler.pkl"))
+judge_echo_intensity_model , judge_echo_intensity_scaler = load_svm_model(os.path.join(download_dir, "svm_models",
+                                                                                       "judge_echo_intensity_model.pkl"),
+                                                                          os.path.join(download_dir, "svm_models",
+                                                                                       "judge_echo_intensity_scaler.pkl"))
+judge_microcalcification_model, judge_microcalcification_scaler = load_svm_model(os.path.join(download_dir, "svm_models",
+                                                                                              "judge_microcalcification_model.pkl"),
+                                                                          os.path.join(download_dir, "svm_models",
+                                                                                       "judge_microcalcification_scaler.pkl"))
+judge_solidity_model, judge_solidity_scaler = load_svm_model(os.path.join(download_dir, "svm_models",
+                                                                          "judge_solidity_model.pkl"),
+                                                                          os.path.join(download_dir,
+                                                                                       "svm_models", "judge_solidity_scaler.pkl"))
 
 USE_ORANGE_PI = False
 
@@ -95,8 +103,7 @@ signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
 # 判断是否下载推理用图片
-current_directory = os.getcwd()
-image_path = os.path.join(current_directory, 'ultrasound_images_to_show')
+image_path = os.path.join(download_dir, 'ultrasound_images_to_show')
 if not os.path.exists(image_path):
     download_ultrasound_images()
 
@@ -144,13 +151,13 @@ if USE_ORANGE_PI:
 
     acl_resource = AclLiteResource()
     acl_resource.init()
-    model_path = os.path.join(current_directory, "nested_unet.om")
+    model_path = os.path.join(download_dir, "nested_unet.om")
     if not os.path.exists(model_path):
         download_nested_unet_om()
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(current_directory, 'nested_unet_checkpoints')
+    ckpt_path = os.path.join(download_dir, 'nested_unet_checkpoints')
     if not os.path.exists(ckpt_path):
         download_and_unzip_nested_unet_checkpoints()
     ckpt_file = os.path.join(ckpt_path, 'nested_unet_checkpoints.ckpt')
@@ -185,13 +192,17 @@ def infer_ultrasound_image(image):
     processed_output = cv2.morphologyEx(opened_output, cv2.MORPH_CLOSE, kernel)
     resized_output = cv2.resize(processed_output, dsize=(572, 572))
     contours, _ = cv2.findContours(resized_output, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    result_image = cv2.drawContours(cv2.resize(copied_image, dsize=(572, 572)), contours, -1, (100, 255, 0), 1)
+    result_image = cv2.drawContours(np.copy(copied_image), contours, -1, (100, 255, 0), 1)
 
     result = ""
+    if len(contours[0]) == 0:
+        result = "未发现结节"
+        return result_image, result
+
     flag = 0
     # 计算结节区域水平和垂直的外界矩形
     x, y, w, h = cv2.boundingRect(contours[0])  # 获取水平垂直的外界矩形；x,y对应的点是image[y][x]
-    roi = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)[y:y + h, x:x + w]  # 边界矩形区域
+    roi = cv2.cvtColor(copied_image, cv2.COLOR_RGB2GRAY)[y:y + h, x:x + w]  # 边界矩形区域
 
     if h - w > 10:
         result += "纵横比大于1 "
@@ -228,22 +239,25 @@ def infer_ultrasound_image(image):
         result += "无微钙化现象 "
 
     grade_list = ["TR1", "TR1", "TR2", "TR3", "TR4 A", "TR4 B", "TR4 C", "TR5"]
-    advice_list = ["恶性可能≤2%，根据自身需求决定是否进一步检查",
-              "恶性可能≤2%，根据自身需求决定是否进一步检查",
-              "恶性可能≤2%，根据自身需求决定是否进一步检查",
+    advice_list = ["恶性可能≤2%，建议根据自身需求决定是否进一步检查",
+              "恶性可能≤2%，建议根据自身需求决定是否进一步检查",
+              "恶性可能≤2%，建议根据自身需求决定是否进一步检查",
               "恶性可能＜5%，建议根据结节大小进行随访或细针穿刺活检",
-              "恶性可能约5%，建议根据结节大小进行随访或细针穿刺活检",
-              "恶性可能约10%，建议进行随访或细针穿刺活检",
-              "恶性可能约20%，建议进行随访或细针穿刺活检",
-              "恶性可能＞20%，强烈建议进行细针穿刺活检，并根据结节大小进行定期随访"]
+              "恶性风险2%-10%，建议根据结节大小进行随访或细针穿刺活检",
+              "恶性风险10%-50%，建议进行随访或细针穿刺活检",
+              "恶性可能约50%-90%，强烈建议进行随访或细针穿刺活检",
+              "恶性可能＞90%，请立即进行细针穿刺活检"]
 
     grade1 = grade_list[min(flag, 7)]
     grade2 = grade_list[min(flag + 1, 7)]
     advice1 = advice_list[min(flag, 7)]
     advice2 = advice_list[min(flag + 1, 7)]
 
-    result += (f"请观察结节外观，若边界清晰且规则，则初步定级为{grade1}, 若边界模糊且不规则，则初步定级为{grade2},前者{advice1},"
-               f"后者{advice2}")
+
+    if grade1 == grade2:
+        result += f"初步定级为{grade1}, {advice1}"
+    else:
+        result += f"请观察结节外观，若边界清晰且规则，则初步定级为{grade1}，{advice1},若边界模糊且不规则，则初步定级为{grade2}，{advice2}"
     return result_image, result
 
 with gr.Blocks(theme=my_theme) as demo:

@@ -13,8 +13,10 @@ from src.machine_learning.dataloader import (create_segmentation_dataset_at_nump
 from src.machine_learning.networks import NestedUNet
 from src.machine_learning.utils import get_time
 from src.machine_learning.configuration import NestedUNetConfig
+from launcher import get_project_root
 
 
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 if os.name == 'nt':
     context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
@@ -29,13 +31,11 @@ else:
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
 
 config = NestedUNetConfig()
-
-val_images = np.load(os.path.join("datasets_as_numpy", "val_images.npy"))
-val_masks = np.load(os.path.join("datasets_as_numpy", "val_masks.npy"))
+val_images = np.load(os.path.join(download_dir, "datasets_as_numpy", "val_images.npy"))
+val_masks = np.load(os.path.join(download_dir, "datasets_as_numpy", "val_masks.npy"))
 
 net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
-current_directory = os.getcwd()
-ckpt_directory = os.path.join(current_directory, 'nested_unet_checkpoints')
+ckpt_directory = os.path.join(download_dir, 'nested_unet_checkpoints')
 if not os.path.exists(ckpt_directory):
     download_and_unzip_nested_unet_checkpoints()
 else:
@@ -57,7 +57,7 @@ model = Model(net, loss_fn=loss_function, loss_scale_manager=loss_scale_manager,
 def eval_nested_unet():
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
-    if not os.path.exists('datasets_as_numpy'):
+    if not os.path.exists(os.path.join(download_dir, 'datasets_as_numpy')):
         download_and_unzip_segmentation_datasets()
     else:
         pass
@@ -82,7 +82,7 @@ def infer_nested_unet():
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
 
     start_time = time.time()
-    target_directory = os.path.join(current_directory, 'figures')
+    target_directory = os.path.join(download_dir, 'figures')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:

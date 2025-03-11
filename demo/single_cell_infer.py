@@ -10,6 +10,9 @@ from mindspore import Tensor
 from mindspore import context
 from src.machine_learning.dataloader import download_and_unzip_best_mlp_checkpoints, download_and_unzip_mlp_datasets
 from src.machine_learning.networks import CellSortMlp
+from launcher import get_project_root
+
+download_dir = get_project_root()
 """单甲状腺上皮细胞特征检测器,
    癌变细胞标签为[1, 0]，正常细胞标签为[0, 1],
    数据尺度要求：0.25 微米/像素"""
@@ -55,21 +58,21 @@ def on_terminate(signum, frame):
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
         sys.exit(0)
 
-if not os.path.exists('best_mlp_checkpoints'):
+if not os.path.exists(os.path.join(download_dir, 'best_mlp_checkpoints')):
     download_and_unzip_best_mlp_checkpoints()
 else:
     pass
 
-if not os.path.exists('mlp_datasets'):
+if not os.path.exists(os.path.join(download_dir, 'mlp_datasets')):
     download_and_unzip_mlp_datasets()
 else:
     pass
 
-means = np.load(os.path.join("mlp_datasets", "mean.npy"))
-stds = np.load(os.path.join("mlp_datasets", "std.npy"))
+means = np.load(os.path.join(download_dir, "mlp_datasets", "mean.npy"))
+stds = np.load(os.path.join(download_dir, "mlp_datasets", "std.npy"))
 
 net = CellSortMlp()
-params = mindspore.load_checkpoint(os.path.join("best_mlp_checkpoints", "best_mlp_model_checkpoints.ckpt"))
+params = mindspore.load_checkpoint(os.path.join(download_dir, "best_mlp_checkpoints", "best_mlp_model_checkpoints.ckpt"))
 mindspore.load_param_into_net(net, params)
 
 if USE_ORANGE_PI:
@@ -96,7 +99,6 @@ def infer_single_cell(input_features):
     input_tensor = Tensor(features)
     for i in range(input_tensor.shape[0]):
         result = net(input_tensor[i])
-        print(result)
         if result[0] > result[1]:
             counts += 1
 

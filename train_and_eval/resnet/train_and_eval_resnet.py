@@ -13,8 +13,10 @@ from src.machine_learning.dataloader.load_resnet_data import (create_dataset_wit
                                                               generate_images_and_labels,
                                                               )
 from src.machine_learning.dataloader.download_resnet_data import download_and_unzip_resnet_datasets
+from launcher import get_project_root
 
 
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 mindspore.set_seed(1)
 if os.name == 'nt':
@@ -93,9 +95,7 @@ def train_net(train_images, train_labels, batch_size, method):
     model.train(30, train_datasets, callbacks=mindspore.LossMonitor(1),
                 sink_size=train_datasets.get_dataset_size(), dataset_sink_mode=True)
     print('========================== Training Ended ==========================')
-
-    current_directory = os.getcwd()
-    target_directory = os.path.join(current_directory, f'medical_resnet_checkpoints({method})')
+    target_directory = os.path.join(download_dir, f'medical_resnet_checkpoints({method})')
     if not os.path.exists(target_directory):
         os.makedirs(target_directory)
     else:
@@ -106,7 +106,7 @@ def eval_net(val_images, val_labels, method):
     eval_datasets = create_dataset_with_numpy(val_images, val_labels, batch_size=1, is_train=False)
     net = resnet152()
     metrics = {"acc"}
-    params = mindspore.load_checkpoint(os.path.join(f"medical_resnet_checkpoints({method})", "medical_resnet_checkpoints.ckpt"))
+    params = mindspore.load_checkpoint(os.path.join(download_dir, f"medical_resnet_checkpoints({method})", "medical_resnet_checkpoints.ckpt"))
     mindspore.load_param_into_net(net, params)
     loss = init_loss_scale()
     lr = 0.001
@@ -129,19 +129,19 @@ if __name__ == '__main__':
     method = "pad"
     if not use_custom_datasets:
         if method == "pad":
-            if not (os.path.exists('padding_datasets')):
+            if not (os.path.exists(os.path.join(download_dir, 'padding_datasets'))):
                 download_and_unzip_resnet_datasets(method="pad")
-            train_images = np.load(os.path.join("padding_datasets", "train_images.npy"))
-            train_labels = np.load(os.path.join("padding_datasets", "train_labels.npy"))
-            val_images = np.load(os.path.join("padding_datasets", "val_images.npy"))
-            val_labels = np.load(os.path.join("padding_datasets", "val_labels.npy"))
+            train_images = np.load(os.path.join(download_dir, "padding_datasets", "train_images.npy"))
+            train_labels = np.load(os.path.join(download_dir, "padding_datasets", "train_labels.npy"))
+            val_images = np.load(os.path.join(download_dir, "padding_datasets", "val_images.npy"))
+            val_labels = np.load(os.path.join(download_dir, "padding_datasets", "val_labels.npy"))
         else:
-            if not (os.path.exists('crop_datasets')):
+            if not (os.path.exists(os.path.join(download_dir, 'crop_datasets'))):
                 download_and_unzip_resnet_datasets(method="crop")
-            train_images = np.load(os.path.join("crop_datasets", "train_images.npy"))
-            train_labels = np.load(os.path.join("crop_datasets", "train_labels.npy"))
-            val_images = np.load(os.path.join("crop_datasets", "val_images.npy"))
-            val_labels = np.load(os.path.join("crp[_datasets", "val_labels.npy"))
+            train_images = np.load(os.path.join(download_dir, "crop_datasets", "train_images.npy"))
+            train_labels = np.load(os.path.join(download_dir, "crop_datasets", "train_labels.npy"))
+            val_images = np.load(os.path.join(download_dir, "crop_datasets", "val_images.npy"))
+            val_labels = np.load(os.path.join(download_dir, "crp[_datasets", "val_labels.npy"))
         train_net(train_images, train_labels, batch_size=16, method=method)
         eval_net(val_images, val_labels, method=method)
 

@@ -7,8 +7,10 @@ import numpy as np
 import gradio as gr
 from src.machine_learning.dataloader import download_ultrasound_images
 from src.machine_learning.utils import is_ascend_available, is_gpu_available
+from launcher import get_project_root
 
 
+download_dir = get_project_root()
 USE_ORANGE_PI = False
 
 # 后端类型判断及context设置
@@ -70,8 +72,7 @@ signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
 # 判断是否下载推理用图片
-current_directory = os.getcwd()
-image_path = os.path.join(current_directory, 'ultrasound_images_to_show')
+image_path = os.path.join(download_dir, 'ultrasound_images_to_show')
 if not os.path.exists(image_path):
     download_ultrasound_images()
 
@@ -119,13 +120,13 @@ if USE_ORANGE_PI:
 
     acl_resource = AclLiteResource()
     acl_resource.init()
-    model_path = os.path.join(current_directory, "unet.om")
+    model_path = os.path.join(download_dir, "unet.om")
     if not os.path.exists(model_path):
         download_unet_om()
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(current_directory, 'unet_checkpoints')
+    ckpt_path = os.path.join(download_dir, 'unet_checkpoints')
     if not os.path.exists(ckpt_path):
         download_and_unzip_unet_checkpoints()
     ckpt_file = os.path.join(ckpt_path, 'unet_checkpoints.ckpt')
