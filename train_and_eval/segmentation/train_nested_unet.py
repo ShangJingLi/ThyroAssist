@@ -43,16 +43,24 @@ USE_ORANGE_PI = False
 mindspore.set_seed(1)
 config = NestedUNetConfig()
 if os.name == 'nt':
-    context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+    context.set_context(mode=context.GRAPH_MODE)
+    mindspore.set_device(device_target='CPU')
 else:
     try:
         if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
+            context.set_context(mode=context.GRAPH_MODE, jit_config={"jit_level": "O2"})
+            mindspore.set_device(device_target='Ascend')
             USE_ORANGE_PI = True
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target='Ascend')
     except:
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
+        try:
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="GPU")
+        except:
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="CPU")
 
 
 def trainer(epoch=config.train_epoch, batch_size=config.train_batch_size, lr=config.lr):

@@ -1,7 +1,9 @@
 import time
+import subprocess
 import mindspore
 import numpy as np
 from mindspore import nn
+import onnxruntime as ort
 
 
 class StopTimeMonitor(mindspore.Callback):
@@ -78,22 +80,31 @@ def restore_ckpt(part_prefix, output_file):
 
 
 def is_ascend_available():
-    """检测Ascend环境是否可用"""
     try:
-        from mindspore import context
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-        return True
-    except (ImportError, RuntimeError):
-        return False
+        # 尝试执行 set_env.sh 脚本以配置 Ascend 环境
+        result = subprocess.run(
+            ['/bin/bash', '-c', 'source /usr/local/Ascend/ascend-toolkit/set_env.sh && env'],  # 使用 `env` 检查环境变量
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
+
+        # 检查命令的返回码
+        if result.returncode == 0:
+            # 进一步检查是否设置了 Ascend 相关的环境变量
+            if "ASCEND_HOME" in result.stdout or "ASCEND_OPP_PATH" in result.stdout:
+                return True
+    except (FileNotFoundError, Exception):
+        # 捕获所有异常但不输出任何信息
+        pass
+
+    return False
+
 
 def is_gpu_available():
-    """检测GPU环境是否可用"""
-    try:
-        from mindspore import context
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
-        return True
-    except (ImportError, RuntimeError):
-        return False
+    available_providers = ort.get_available_providers()
+    return "TensorrtExecutionProvider" in available_providers
 
 
 def export_ms_model(net:nn.Cell, model_name:str, input_shape:tuple,checkpoint_file_path:str, file_format:str):

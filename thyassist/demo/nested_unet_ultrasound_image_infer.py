@@ -1,12 +1,13 @@
+"""基于UNet++和支持向量机的甲状腺超声影像分析"""
 import os
 import subprocess
 import signal
 import sys
 import cv2
 import numpy as np
+import onnxruntime as ort
 import gradio as gr
-from thyassist.machine_learning.dataloader import (download_ultrasound_images,
-                                                   download_svm_model,
+from thyassist.machine_learning.dataloader import (download_svm_model,
                                                    load_svm_model,
                                                    extract_features_from_image)
 from thyassist.machine_learning.utils import is_ascend_available, is_gpu_available
@@ -43,55 +44,39 @@ judge_solidity_model, judge_solidity_scaler = load_svm_model(os.path.join(downlo
                                                                                        "svm_models", "judge_solidity_scaler.pkl"))
 
 USE_ORANGE_PI = False
+USE_ACL = False
+selected_provider = 'CPUExecutionProvider'
 
-# 后端类型判断及context设置
-if os.name == 'nt':  # Windows操作系统, 使用CPU
-    import mindspore
-    from mindspore import Tensor, context
-    from thyassist.machine_learning.networks import NestedUNet
-    from thyassist.machine_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-    context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
-    print("使用CPU环境启动模型推理")
-else:
+if is_ascend_available():
+    # 使用昇腾硬件进行模型推理
+    current_user = subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip()
+    if current_user == 'HwHiAiUser':  # 如果当前用户是HwHiAiUser
+        USE_ORANGE_PI = True
     try:
-        current_user = subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip()
-        if current_user == 'HwHiAiUser':  # 如果当前用户是HwHiAiUser
-            import acl
-            import acllite_utils as utils
-            from acllite_model import AclLiteModel
-            from acllite_resource import resource_list
-            from thyassist.machine_learning.dataloader import download_nested_unet_om
-            USE_ORANGE_PI = True
-            print("使用香橙派启动模型推理，模型格式为.om")
-        elif is_ascend_available():  # 检测Ascend环境是否可用
-            import mindspore
-            from mindspore import Tensor, context
-            from thyassist.machine_learning.networks import NestedUNet
-            from thyassist.machine_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-            context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
-            print("使用Ascend环境启动模型推理")
-        elif is_gpu_available():  # 检测GPU环境是否可用
-            import mindspore
-            from mindspore import Tensor, context
-            from thyassist.machine_learning.networks import NestedUNet
-            from thyassist.machine_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-            context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
-            print("使用GPU环境启动模型推理")
-        else:  # 如果Ascend和GPU都不可用，回退到CPU
-            import mindspore
-            from mindspore import Tensor, context
-            from thyassist.machine_learning.networks import NestedUNet
-            from thyassist.machine_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-            context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
-            print("使用CPU环境启动模型推理")
-    except Exception as e:  # 捕获所有意外错误并回退到CPU
-        print(f"Error detected: {e}")
-        import mindspore
-        from mindspore import Tensor, context
-        from thyassist.machine_learning.networks import NestedUNet
-        from thyassist.machine_learning.dataloader import download_and_unzip_nested_unet_checkpoints
-        context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
-        print("出现意外错误！使用CPU环境启动模型推理")
+        import acl
+        import acllite_utils as utils
+        from acllite_model import AclLiteModel
+        from acllite_resource import resource_list
+        from thyassist.machine_learning.dataloader import download_nested_unet_om
+        print("✅ 使用 Ascend 硬件进行模型推理")
+        USE_ACL = True
+    except FileNotFoundError:
+        # pylint: disable=unused-import
+        from thyassist.machine_learning.dataloader import download_resnet_onnx
+        USE_ACL = False
+        print("⚠️ NPU环境依赖加载异常，回退到CPU环境进行推理")
+
+elif is_gpu_available():
+    # 使用 NVIDIA GPU进行模型推理
+    from thyassist.machine_learning.dataloader import download_nested_unet_onnx
+    selected_provider = 'TensorrtExecutionProvider'
+    print("✅ 使用 NVIDIA GPU 推理")
+
+else:
+    # 无硬件加速，使用CPU
+    from thyassist.machine_learning.dataloader import download_nested_unet_onnx
+    print("⚠️ 无可用 GPU/NPU，回退到 CPU 进行推理")
+
 
 # 若进程终止，将风扇速度降低
 def on_terminate(signum, frame):
@@ -102,14 +87,10 @@ def on_terminate(signum, frame):
 signal.signal(signal.SIGINT, on_terminate)
 signal.signal(signal.SIGTERM, on_terminate)
 
-# 判断是否下载推理用图片
-image_path = os.path.join(os.getcwd(), 'ultrasound_images_to_show')
-if not os.path.exists(image_path):
-    download_ultrasound_images()
-
-if USE_ORANGE_PI:
+if USE_ACL:
     # 使用香橙派，定义pyacl相关组件
-    os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
+    if USE_ORANGE_PI:
+        os.system('sudo npu-smi set -t pwm-duty-ratio -d 100')
 
     class AclLiteResource:
         """ACL Lite Resource management class"""
@@ -157,23 +138,20 @@ if USE_ORANGE_PI:
     model = AclLiteModel(model_path)
 else:
     # 非香橙派环境使用checkpoints进行推理
-    ckpt_path = os.path.join(download_dir, 'nested_unet_checkpoints')
-    if not os.path.exists(ckpt_path):
-        download_and_unzip_nested_unet_checkpoints()
-    ckpt_file = os.path.join(ckpt_path, 'nested_unet_checkpoints.ckpt')
+    model_path = os.path.join(download_dir, "nested_unet.onnx")
+    if not os.path.exists(model_path):
+        download_nested_unet_onnx()
 
-    net = NestedUNet(n_channels=3, n_classes=2, is_train=False)
-    params = mindspore.load_checkpoint(ckpt_file)
-    mindspore.load_param_into_net(net, params)
+    session = ort.InferenceSession(model_path, providers=[selected_provider])
 
 # 定义gradio的Interface类
 def infer_ultrasound_image(image):
     if image.shape == 2:
         image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
-    copied_image = np.copy(image)
+    copied_image = np.copy(cv2.resize(image, dsize=(572, 572)))
     image = cv2.resize(image, dsize=(256, 256))
 
-    if USE_ORANGE_PI:
+    if USE_ACL:
         context, _ = acl.rt.get_context()
         if context != acl_resource.context:
             acl.rt.set_context(acl_resource.context)
@@ -182,10 +160,12 @@ def infer_ultrasound_image(image):
         output_as_numpy = np.argmax(result[0], axis=1).astype(np.uint8) * 255
         output_as_numpy = output_as_numpy.reshape(256, 256)
     else:
-        input_tensor = Tensor(np.expand_dims(image.transpose((2, 0, 1)), axis=0).astype(np.float32)) / 127.5 - 1
-        output_tensor = net(input_tensor)
-        output_as_numpy = np.argmax(output_tensor.asnumpy(), axis=1).astype(np.uint8) * 255
-        output_as_numpy = output_as_numpy.reshape(256, 256)  # 输出图像
+        input_array = np.expand_dims(image.astype(np.float32).transpose((2, 0, 1)), axis=0) / 127.5 - 1
+        input_name = session.get_inputs()[0].name
+        output_name = session.get_outputs()[0].name
+        result = session.run([output_name], {input_name: input_array})
+        output_as_numpy = np.argmax(result[0], axis=1).astype(np.uint8) * 255
+        output_as_numpy = output_as_numpy.reshape(256, 256)
 
     kernel = np.ones((5, 5), np.uint8)
     opened_output = cv2.morphologyEx(output_as_numpy, cv2.MORPH_OPEN, kernel)

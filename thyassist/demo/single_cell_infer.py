@@ -1,3 +1,6 @@
+# 癌变细胞标签为[1, 0]，正常细胞标签为[0, 1],
+# 数据尺度要求：0.25 微米/像素
+"""单甲状腺上皮细胞特征检测器"""
 import os
 import subprocess
 import sys
@@ -12,11 +15,8 @@ from thyassist.machine_learning.dataloader import download_and_unzip_best_mlp_ch
 from thyassist.machine_learning.networks import CellSortMlp
 from launcher import get_project_root
 
-download_dir = get_project_root()
-"""单甲状腺上皮细胞特征检测器,
-   癌变细胞标签为[1, 0]，正常细胞标签为[0, 1],
-   数据尺度要求：0.25 微米/像素"""
 
+download_dir = get_project_root()
 
 my_theme = gr.themes.Soft(
     primary_hue="blue",
@@ -46,17 +46,31 @@ if os.name == 'nt':
 else:
     try:
         if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
+            context.set_context(mode=context.GRAPH_MODE, jit_config={"jit_level": "O2"})
+            mindspore.set_device(device_target="Ascend")
             USE_ORANGE_PI = True
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="Ascend")
     except:
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
+        try:
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="GPU")
+        except:
+            mindspore.set_context()
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="CPU")
 
 def on_terminate(signum, frame):
     if USE_ORANGE_PI:
         os.system('sudo npu-smi set -t pwm-duty-ratio -d 30')
         sys.exit(0)
+
+
+def softmax(x):
+    # 为了避免数值下溢，先减去数组中的最大值（数值稳定性技巧）
+    exps = np.exp(x - np.max(x))
+    return exps / np.sum(exps, axis=0)
 
 if not os.path.exists(os.path.join(download_dir, 'best_mlp_checkpoints')):
     download_and_unzip_best_mlp_checkpoints()
@@ -115,7 +129,8 @@ iface = gr.Interface(
     inputs=dataframe_input,
     outputs=output,
     title="甲状腺上皮细胞特征检测器",
-    description="上传特征文件，检测细胞是否属于癌细胞"
+    description="上传特征文件，检测细胞是否属于癌细胞",
+    theme=my_theme
 )
 
 iface.launch(inbrowser=True)

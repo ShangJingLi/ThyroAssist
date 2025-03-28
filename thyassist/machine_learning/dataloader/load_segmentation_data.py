@@ -134,23 +134,6 @@ def preprocess_img_mask(img, mask, num_classes, img_size,  mask_size, augment=Fa
     return img, mask  # 返回单张数据集和标签
 
 
-def create_segmentation_dataset(data_dir, img_size, mask_size, repeat, batch_size, num_classes=2, is_train=False, augment=False,
-                                split=1, rank=0, group_size=1, shuffle=True):
-    """
-    Get generator dataset for multi-class dataset.
-    """
-
-    mc_dataset = MultiClassDataset(data_dir, repeat, is_train, split, shuffle)  # 获取数据集
-    dataset = ds.GeneratorDataset(mc_dataset, mc_dataset.column_names, shuffle=True,
-                                  num_shards=group_size, shard_id=rank, python_multiprocessing=is_train)
-    compose_map_func = (lambda image, mask: preprocess_img_mask(image, mask, num_classes, tuple(img_size),
-                                                                tuple(mask_size), augment and is_train))
-    dataset = dataset.map(operations=compose_map_func, input_columns=mc_dataset.column_names,
-                          output_columns=mc_dataset.column_names)
-    dataset = dataset.batch(batch_size, drop_remainder=is_train)
-    return dataset
-
-
 def create_segmentation_dataset_at_numpy(images, masks, img_size, mask_size, batch_size,
                                          num_classes=2, is_train=False, augment=False,
                                          rank=0, group_size=1, shuffle=True):
@@ -169,5 +152,4 @@ def create_segmentation_dataset_at_numpy(images, masks, img_size, mask_size, bat
     return dataset
 
 
-__all__ = ['create_segmentation_dataset',
-           'create_segmentation_dataset_at_numpy']
+__all__ = ['create_segmentation_dataset_at_numpy']

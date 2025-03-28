@@ -1,6 +1,5 @@
 import os
 import warnings
-import random
 import multiprocess
 import cv2
 import numpy as np
@@ -101,9 +100,6 @@ def convert_to_numpy(images_path, method:str, padding:int = None, aim_size:tuple
     class_a_files = [file for file in os.listdir(os.path.join(images_path, "A")) if file.lower().endswith('.jpg')]
     class_b_files = [file for file in os.listdir(os.path.join(images_path, "B")) if file.lower().endswith('.jpg')]
 
-    random.shuffle(class_a_files)
-    random.shuffle(class_b_files)
-
     images_a = np.zeros(shape=(len(class_a_files), aim_size[0], aim_size[1], 3), dtype=np.uint8)
     images_b = np.zeros(shape=(len(class_b_files), aim_size[0], aim_size[1], 3), dtype=np.uint8)
 
@@ -144,8 +140,8 @@ def generate_images_and_labels(images_a:np.array, images_b:np.array, batch_size=
         n_train = batch_size * q
 
     n_val = n_images - n_train
-    n_val_a = int(0.5 * n_val)
-    n_val_b = n_val - n_val_a
+    n_val_a = min(int(0.5 * n_val), 50)
+    n_val_b = min(n_val - n_val_a, 50)
 
     train_images = np.concatenate((images_a[:-n_val_a, :, :, :],
                                    images_b[:-n_val_b, :, :, :]), axis=0)

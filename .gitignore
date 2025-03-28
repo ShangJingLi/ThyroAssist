@@ -171,6 +171,7 @@ checkpoint-*/
 
 fusion_result.json
 aclinit.json
+file_manifest.json
 
 *.om
 *.air

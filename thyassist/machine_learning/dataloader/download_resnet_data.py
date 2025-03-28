@@ -14,7 +14,7 @@ def download_and_unzip_resnet_datasets(method:str):
         openi.download_file(repo_id="enter/medical_resnet", file="padding_datasets.zip", cluster="NPU",
                             save_path=download_dir,
                             force=False)
-        zip_file_path = 'padding_datasets.zip'
+        zip_file_path = os.path.join(download_dir, 'padding_datasets.zip')
     else:
         openi.download_file(repo_id="enter/medical_resnet", file="crop_datasets.zip", cluster="NPU",
                             save_path=download_dir,
@@ -39,12 +39,10 @@ def download_and_unzip_resnet_datasets(method:str):
 def download_and_unzip_resnet_checkpoints(method:str):
     if method not in ["pad", "crop"]:
         raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
-    if method == "pad":
-        openi.download_model(repo_id="enter/medical_resnet",model_name="medical_resnet_checkpoints_pad",save_path=download_dir)
-        zip_file_path = os.path.join(download_dir, "medical_resnet_checkpoints(pad).zip")
-    else:
-        openi.download_model(repo_id="enter/medical_resnet", model_name="medical_resnet_checkpoints_crop", save_path=download_dir)
-        zip_file_path = os.path.join(download_dir, "medical_resnet_checkpoints(crop).zip")
+
+    openi.download_model(repo_id="enter/medical_resnet", model_name=f"medical_resnet_checkpoints({method})",
+                         save_path=download_dir)
+    zip_file_path = os.path.join(download_dir, f"medical_resnet_checkpoints({method}).zip")
 
     # 检查ZIP文件是否存在
     if os.path.exists(zip_file_path):
@@ -61,13 +59,26 @@ def download_and_unzip_resnet_checkpoints(method:str):
 
     print('数据集下载和解压已完成')
 
+
 def download_resnet_om(method:str):
     if method not in ["pad", "crop"]:
         raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
-    openi.download_model(repo_id="enter/nodule_segmentation",
-                         model_name=f"medical_resnet({method})",save_path=download_dir)
+    openi.download_model(repo_id="enter/medical_resnet",
+                         model_name=f"medical_resnet_om({method})",save_path=download_dir)
 
-    model_path = os.path.join(download_dir, 'medical_resnet.om')
+    model_path = os.path.join(download_dir, 'medical_resnet.onnx')
+    # 检查ZIP文件是否存在
+    if os.path.exists(model_path):
+        print('模型文件 medical_resnet.om 下载已完成')
+
+
+def download_resnet_onnx(method:str):
+    if method not in ["pad", "crop"]:
+        raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
+    openi.download_model(repo_id="enter/medical_resnet",
+                         model_name=f"medical_resnet_onnx({method})",save_path=download_dir)
+
+    model_path = os.path.join(download_dir, 'medical_resnet.onnx')
     # 检查ZIP文件是否存在
     if os.path.exists(model_path):
         print('模型文件 medical_resnet.om 下载已完成')
@@ -97,4 +108,5 @@ def download_pathological_images():
 __all__ = ['download_and_unzip_resnet_datasets',
            'download_and_unzip_resnet_checkpoints',
            'download_resnet_om',
+           "download_resnet_onnx",
            "download_pathological_images"]

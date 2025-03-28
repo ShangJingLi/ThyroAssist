@@ -19,7 +19,7 @@ def extract_features_from_image(image_path):
         image_gray = color.rgb2gray(image)
 
     if image_gray.shape != (32, 32):
-        cv2.resize(image_gray, dsize=(32, 32))
+        image_gray = cv2.resize(image_gray, dsize=(32, 32))
 
     # 提取HOG特征 (Histogram of Oriented Gradients)
     features = feature.hog(image_gray, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)

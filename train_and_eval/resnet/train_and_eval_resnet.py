@@ -20,16 +20,24 @@ download_dir = get_project_root()
 USE_ORANGE_PI = False
 mindspore.set_seed(1)
 if os.name == 'nt':
-    context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+    context.set_context(mode=context.GRAPH_MODE)
+    mindspore.set_device(device_target='CPU')
 else:
     try:
         if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', jit_config={"jit_level": "O2"})
+            context.set_context(mode=context.GRAPH_MODE, jit_config={"jit_level": "O2"})
+            mindspore.set_device(device_target='Ascend')
             USE_ORANGE_PI = True
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target='Ascend')
     except:
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
+        try:
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="GPU")
+        except:
+            context.set_context(mode=context.GRAPH_MODE)
+            mindspore.set_device(device_target="CPU")
 
 
 def init_lr(step_size):
@@ -90,7 +98,7 @@ def train_net(train_images, train_labels, batch_size, method):
     model = mindspore.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
                             amp_level="O0", boost_level=config.boost_mode,
                             boost_config_dict={"grad_freeze": {"total_steps": config.epoch_size * step_size}})
-    # train model
+    # 执行训练
     print('========================== Starting Training ==========================')
     model.train(30, train_datasets, callbacks=mindspore.LossMonitor(1),
                 sink_size=train_datasets.get_dataset_size(), dataset_sink_mode=True)
@@ -110,7 +118,7 @@ def eval_net(val_images, val_labels, method):
     mindspore.load_param_into_net(net, params)
     loss = init_loss_scale()
     lr = 0.001
-    # define opt
+
     opt = nn.Adam(params=net.trainable_params(), learning_rate=lr)
     model = mindspore.Model(net, loss_fn=loss, optimizer=opt,metrics=metrics, boost_level=config.boost_mode)
 

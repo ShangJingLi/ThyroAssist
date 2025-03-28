@@ -3,4 +3,4 @@
 pip install -r requirements.txt
 
 # run the demo
-python demo/single_cell_infer.py
+python thyassist/demo/single_cell_infer.py
