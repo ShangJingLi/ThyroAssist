@@ -110,17 +110,18 @@ def infer_single_cell(input_features):
 
     counts = 0
 
+    text = "可疑样本序号为："
     input_tensor = Tensor(features)
     for i in range(input_tensor.shape[0]):
         result = net(input_tensor[i])
         if result[0] > result[1]:
             counts += 1
+            text += f"{i+1} "
 
     if counts == 0:
         text = "经模型检测，未发现带有癌细胞特征的样本"
     else:
-        text = f"经模型检测，共{counts}个样本具有疑似癌细胞的特征"
-
+        text = f"经模型检测，共{counts}个样本具有疑似癌细胞的特征" + text
     return text
 
 # 创建 Gradio 接口
