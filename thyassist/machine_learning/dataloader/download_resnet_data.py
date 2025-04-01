@@ -66,7 +66,7 @@ def download_resnet_om(method:str):
     openi.download_model(repo_id="enter/medical_resnet",
                          model_name=f"medical_resnet_om({method})",save_path=download_dir)
 
-    model_path = os.path.join(download_dir, 'medical_resnet.onnx')
+    model_path = os.path.join(download_dir, 'medical_resnet.om')
     # 检查ZIP文件是否存在
     if os.path.exists(model_path):
         print('模型文件 medical_resnet.om 下载已完成')
@@ -81,7 +81,7 @@ def download_resnet_onnx(method:str):
     model_path = os.path.join(download_dir, 'medical_resnet.onnx')
     # 检查ZIP文件是否存在
     if os.path.exists(model_path):
-        print('模型文件 medical_resnet.om 下载已完成')
+        print('模型文件 medical_resnet.onnx 下载已完成')
 
 def download_pathological_images():
     openi.download_file(repo_id="enter/nodule_segmentation", file="pathological_images_to_show.zip", cluster="NPU",
