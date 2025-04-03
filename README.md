@@ -161,10 +161,15 @@ conda activate myenv  # "myenv"是希望安装本项目的环境
 pip install .
 ```
 
- _注意：自动安装的mindspore仅支持CPU，若需要使用GPU或昇腾芯片加速，请参考mindspore官网的安装教程：https://www.mindspore.cn/install ,GPU加速需要执行如下命令_ 
+以上命令也可简化为：
 ```
-echo 'export CUDA_HOME="/usr/local/cuda-11.6"' >> ~/.bashrc  # 假设安装的cuda版本为11.6
+conda activate myenv
+pip install git+https://github.com/ShangJingLi/ThyroAssist.git
 ```
+
+
+ _注意：以上安装方式仅支持CPU，若需使用NVIDIA GPU加速，请安装CUDA、CUDNN和TensorRT_ 
+
 ---
 
 ## 使用说明
@@ -220,7 +225,7 @@ thyassist pathology  # 初次使用会在thyassist/目录下载模型文件
 ```
 
 等待片刻后，若浏览器显示如下界面，则启动成功：
-![超声分析模块工作流程](https://foruda.gitee.com/images/1741704102384661520/814daba4_14298655.png "屏幕截图")
+![](https://foruda.gitee.com/images/1741704102384661520/814daba4_14298655.png "屏幕截图")
 
  _注意：本模块初次启动需要下载模型文件，故初次启动较慢_ 
 
@@ -234,7 +239,7 @@ thyassist single_cell
 ```
 
 等待片刻后，若浏览器显示如下界面，则启动成功：
-![ResNet152网络结构](https://foruda.gitee.com/images/1741704218071614709/5274bcbd_14298655.png "屏幕截图")
+![](https://foruda.gitee.com/images/1741704218071614709/5274bcbd_14298655.png "屏幕截图")
 
 ---
 
