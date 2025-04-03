@@ -13,14 +13,14 @@ ThyAssist(Thyroid Auxiliary Diagnostic Assistant)是一个跨平台的基于深�
 
 
 <p align="center">
-  <img src="architecture1.png" alt="超声模块工作流程">
+  <img src=".gitee/images/ultrasound architecture.png" alt="超声模块工作流程">
 </p>
 
 
  **病理影像分析模块** 使用ResNet152网络对显微镜下的甲状腺结节细针穿刺细胞进行深度特证提取，判断影像中的细胞为癌细胞还是正常细胞。ResNet152网络结构：
 
 <p align="center">
-  <img src="ResNet152.png" alt="ResNet152网络结构">
+  <img src=".gitee/images/ResNet152.png" alt="ResNet152网络结构">
 </p>
 
 
@@ -239,7 +239,9 @@ thyassist single_cell
 ```
 
 等待片刻后，若浏览器显示如下界面，则启动成功：
-![](https://foruda.gitee.com/images/1741704218071614709/5274bcbd_14298655.png "屏幕截图")
+<p align="center">
+  <img src=".gitee/images/single cell Interface.png" alt="ResNet152网络结构">
+</p>
 
 ---
 
