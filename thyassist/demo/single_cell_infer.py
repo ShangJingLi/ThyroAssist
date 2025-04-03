@@ -1,6 +1,6 @@
 # 癌变细胞标签为[1, 0]，正常细胞标签为[0, 1],
 # 数据尺度要求：0.25 微米/像素
-"""单甲状腺上皮细胞特征检测器"""
+"""单甲状腺结节细针穿刺细胞特征检测器"""
 import os
 import subprocess
 import sys
@@ -129,7 +129,7 @@ iface = gr.Interface(
     fn=infer_single_cell,
     inputs=dataframe_input,
     outputs=output,
-    title="甲状腺上皮细胞特征检测器",
+    title="甲状腺结节细针穿刺细胞特征检测器",
     description="上传特征文件，检测细胞是否属于癌细胞",
     theme=my_theme
 )
