@@ -42,7 +42,8 @@ STD = np.array([1.90583571e+01, 2.80879155e+01, 4.29302940e+00, 2.99940421e+01,
 
 USE_ORANGE_PI = False
 if os.name == 'nt':
-    context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+    context.set_context(mode=context.GRAPH_MODE)
+    mindspore.set_device(device_target="CPU")
 else:
     try:
         if subprocess.run(['whoami'], capture_output=True, text=True, check=True).stdout.strip() == 'HwHiAiUser':
