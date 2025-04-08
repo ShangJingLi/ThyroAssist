@@ -16,15 +16,13 @@ class ChannelAttention(nn.Cell):
     Channel Attention module.
     """
 
-    def __init__(self, in_planes, ratio=16):
+    def __init__(self, in_planes, k, ratio=16):
         super(ChannelAttention, self).__init__()
-        self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.max_pool = nn.AdaptiveMaxPool2d(1)
-
+        self.avg_pool = nn.AvgPool2d(kernel_size=k, stride=k)
+        self.max_pool = nn.MaxPool2d(kernel_size=k, stride=k)
         self.fc1 = nn.Conv2d(in_planes, in_planes // ratio, 1, bias_init="zeros")
         self.relu1 = nn.ReLU()
         self.fc2 = nn.Conv2d(in_planes // ratio, in_planes, 1, bias_init="zeros")
-
         self.sigmoid = nn.Sigmoid()
 
     def construct(self, x):
@@ -65,12 +63,12 @@ class UnetUp(nn.Cell):
     Upsampling high_feature with factor=2 and concat with low feature
     """
 
-    def __init__(self, in_channel, out_channel, use_deconv, n_concat=2):
+    def __init__(self, in_channel, out_channel, use_deconv, k, n_concat=2):
         super(UnetUp, self).__init__()
         self.conv = UnetConv2d(in_channel + (n_concat - 2) * out_channel, out_channel, False)
         self.concat = ops.Concat(axis=1)
         self.use_deconv = use_deconv
-        self.channel_attention = ChannelAttention(out_channel)  # 通道注意力模块
+        self.channel_attention = ChannelAttention(out_channel, k=k)  # 通道注意力模块
         if use_deconv:
             self.up_conv = nn.Conv2dTranspose(in_channel, out_channel, kernel_size=2, stride=2, pad_mode="same",
                                               weight_init="normal", bias_init="zeros")
@@ -117,19 +115,19 @@ class NestedUNet(nn.Cell):
         self.conv40 = UnetConv2d(filters[3], filters[4], self.use_bn)
 
         # Up Sample
-        self.up_concat01 = UnetUp(filters[1], filters[0], self.use_deconv, 2)
-        self.up_concat11 = UnetUp(filters[2], filters[1], self.use_deconv, 2)
-        self.up_concat21 = UnetUp(filters[3], filters[2], self.use_deconv, 2)
-        self.up_concat31 = UnetUp(filters[4], filters[3], self.use_deconv, 2)
+        self.up_concat01 = UnetUp(filters[1], filters[0], self.use_deconv, k=256, n_concat=2)
+        self.up_concat11 = UnetUp(filters[2], filters[1], self.use_deconv, k=128, n_concat=2)
+        self.up_concat21 = UnetUp(filters[3], filters[2], self.use_deconv, k=64, n_concat=2)
+        self.up_concat31 = UnetUp(filters[4], filters[3], self.use_deconv, k=32, n_concat=2)
 
-        self.up_concat02 = UnetUp(filters[1], filters[0], self.use_deconv, 3)
-        self.up_concat12 = UnetUp(filters[2], filters[1], self.use_deconv, 3)
-        self.up_concat22 = UnetUp(filters[3], filters[2], self.use_deconv, 3)
+        self.up_concat02 = UnetUp(filters[1], filters[0], self.use_deconv, k=256, n_concat=3)
+        self.up_concat12 = UnetUp(filters[2], filters[1], self.use_deconv, k=128, n_concat=3)
+        self.up_concat22 = UnetUp(filters[3], filters[2], self.use_deconv, k=64, n_concat=3)
 
-        self.up_concat03 = UnetUp(filters[1], filters[0], self.use_deconv, 4)
-        self.up_concat13 = UnetUp(filters[2], filters[1], self.use_deconv, 4)
+        self.up_concat03 = UnetUp(filters[1], filters[0], self.use_deconv, k=256, n_concat=4)
+        self.up_concat13 = UnetUp(filters[2], filters[1], self.use_deconv, k=128, n_concat=4)
 
-        self.up_concat04 = UnetUp(filters[1], filters[0], self.use_deconv, 5)
+        self.up_concat04 = UnetUp(filters[1], filters[0], self.use_deconv, k=256, n_concat=5)
 
         # Finale Convolution
         self.final1 = nn.Conv2d(filters[0], n_classes, 1, weight_init="normal", bias_init="zeros")
