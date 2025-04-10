@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import mindspore.dataset as ds
 from mindspore.dataset.vision.transforms import Rescale, HWC2CHW
+from thyassist.image_processor.image_utils import random_rotate, random_flip, random_brightness, random_channel_swap
 
 
 def boundary_padding(origin_images:np.array, padding, aim_size:tuple=(572, 572)):
@@ -70,7 +71,6 @@ def center_crop(origin_images:np.array, aim_size:tuple=(572, 572)):
         k = origin_images.shape[1] / origin_images.shape[0]
         if k > 1:
             image = cv2.resize(origin_images, dsize=(int(k * aim_size[0]), aim_size[0]))
-            print(int((k - 1) * aim_size[0]))
             processed_image = image[:, int(0.5 * (k - 1) * aim_size[0]):
                                        int(0.5 * (k - 1) * aim_size[0]) + aim_size[0], :]
         else:
@@ -84,7 +84,7 @@ def center_crop(origin_images:np.array, aim_size:tuple=(572, 572)):
         raise ValueError(f"'origin_images.ndim' must be 3 or 4, but got {origin_images.ndim}!")
 
 
-def convert_to_numpy(images_path, method:str, padding:int = None, aim_size:tuple=(572, 572)):
+def convert_to_numpy(images_path, method:str, is_augment, padding:int = None, aim_size:tuple=(572, 572)):
     """将.jpg格式图片转存为numpy数组，便于后续处理"""
     if method not in ["pad", "crop"]:
         raise ValueError(f"Invalid method '{method}'. Valid methods are 'pad' and 'crop'.")
@@ -106,10 +106,27 @@ def convert_to_numpy(images_path, method:str, padding:int = None, aim_size:tuple
     for i in range(len(class_a_files)):
         image = cv2.imread(os.path.join(images_path, "A", f"{class_a_files[i]}"))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
         if method == "pad":
             image = boundary_padding(image, aim_size=aim_size, padding=padding)
         else:
             image = center_crop(image, aim_size)
+
+        if is_augment:
+            random_code = np.random.choice([0, 1, 2, 3, 4])
+            if random_code == 0:
+                image = random_rotate(image)
+            elif random_code == 1:
+                image = random_flip(image)
+            elif random_code == 2:
+                image = random_brightness(image)
+            elif random_code == 3:
+                image = random_channel_swap(image)
+            elif random_code == 4:
+                image = image
+            else:
+                raise ValueError("Random code is out of the range!")
+
         images_a[i] = image
 
     for i in range(len(class_b_files)):

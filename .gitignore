@@ -13,7 +13,8 @@ kernel_meta/
 ultrasound_images_to_show/
 pathological_images_to_show/
 svm_models/
-padding_datasets/
+*padding_datasets/
+*crop_datasets/
 origin_datasets/
 origin_images/
 train_images.npy

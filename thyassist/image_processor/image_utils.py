@@ -255,11 +255,12 @@ def random_flip(image):
 
 
 def random_rotate(image, angle_range=30):
-    """随机旋转"""
+    """随机旋转，并用255填充缺失部分"""
     h, w = image.shape[:2]
     angle = np.random.uniform(-angle_range, angle_range)
     M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-    return cv2.warpAffine(image, M, (w, h))
+    # 使用 borderValue=255 填充
+    return cv2.warpAffine(image, M, (w, h), borderValue=(255, 255, 255))
 
 def random_brightness(image, alpha_range=(0.7, 1.3)):
     """随机调整亮度"""
