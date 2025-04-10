@@ -122,8 +122,6 @@ def convert_to_numpy(images_path, method:str, is_augment, padding:int = None, ai
                 image = random_brightness(image)
             elif random_code == 3:
                 image = random_channel_swap(image)
-            elif random_code == 4:
-                image = image
             else:
                 raise ValueError("Random code is out of the range!")
 

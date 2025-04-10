@@ -23,7 +23,7 @@ my_theme = gr.themes.Soft(
     radius_size="md"
 )
 
-method='pad'
+method='crop'
 download_dir = get_project_root()
 print(download_dir)
 USE_ORANGE_PI = False

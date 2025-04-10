@@ -76,8 +76,8 @@ def set_ascend_max_device_memory():
         mindspore.set_context(max_device_memory=config.max_device_memory)
 
 
-def create_datasets(images_path, method, padding=None, aim_size=(572, 572)):
-    images_a, images_b = convert_to_numpy(images_path, method=method, padding=padding, aim_size=aim_size)
+def create_datasets(images_path, method, is_augment, padding=None, aim_size=(572, 572)):
+    images_a, images_b = convert_to_numpy(images_path, method=method, padding=padding, aim_size=aim_size, is_augment=is_augment)
     train_images, train_labels, val_images, val_labels = generate_images_and_labels(images_a, images_b)
     return train_images, train_labels, val_images, val_labels
 
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         eval_net(val_images, val_labels, method=method)
 
     else:
-        images_a, images_b = convert_to_numpy(images_path=custom_datasets_path, method=method)
+        images_a, images_b = convert_to_numpy(images_path=custom_datasets_path, method=method, is_augment=True)
         train_images, train_labels, val_images, val_labels = generate_images_and_labels(images_a,
                                                                                         images_b,
                                                                                         batch_size=batch_size)
