@@ -22,6 +22,7 @@ val_images.npy
 train_masks.npy
 val_masks.npy
 .gradio/
+trt_cache/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

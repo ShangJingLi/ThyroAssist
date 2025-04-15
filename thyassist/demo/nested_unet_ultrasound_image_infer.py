@@ -142,6 +142,20 @@ else:
     if not os.path.exists(model_path):
         download_nested_unet_onnx()
 
+    if is_gpu_available():
+        cache_dir = os.path.join(download_dir, 'trt_cache', 'nested_unet')
+        os.makedirs(cache_dir, exist_ok=True)
+
+        os.environ['ORT_TENSORRT_ENGINE_CACHE_ENABLE'] = '1'
+        os.environ['ORT_TENSORRT_CACHE_PATH'] = cache_dir
+
+        has_cache = any(fname.endswith('.engine') for fname in os.listdir(cache_dir))
+
+        if not has_cache:
+            print(f"🛠️ 检测到首次使用模型 nested_unet.onnx，正在构建 TensorRT 引擎缓存...")
+        else:
+            print(f"✅ 已检测到模型 nested_unet.onnx 的 TensorRT 缓存，将直接加载。")
+
     session = ort.InferenceSession(model_path, providers=[selected_provider])
 
 # 定义gradio的Interface类

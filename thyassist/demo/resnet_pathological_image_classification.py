@@ -51,6 +51,7 @@ elif is_gpu_available():
     # 使用 NVIDIA GPU进行模型推理
     from thyassist.machine_learning.dataloader import download_resnet_onnx
     selected_provider = 'TensorrtExecutionProvider'
+    
     print("✅ 使用 NVIDIA GPU 推理")
 
 else:
@@ -127,6 +128,20 @@ else:
     model_path = os.path.join(download_dir, 'medical_resnet.onnx')
     if not os.path.exists(model_path):
         download_resnet_onnx(method=method)
+        
+    if is_gpu_available():
+        cache_dir = os.path.join(download_dir, 'trt_cache', 'medical_resnet')
+        os.makedirs(cache_dir, exist_ok=True)
+
+        os.environ['ORT_TENSORRT_ENGINE_CACHE_ENABLE'] = '1'
+        os.environ['ORT_TENSORRT_CACHE_PATH'] = cache_dir
+
+        has_cache = any(fname.endswith('.engine') for fname in os.listdir(cache_dir))
+
+        if not has_cache:
+            print(f"🛠️ 检测到首次使用模型 medical_resnet.onnx，正在构建 TensorRT 引擎缓存...")
+        else:
+            print(f"✅ 已检测到模型 medical_resnet.onnx 的 TensorRT 缓存，将直接加载。")
 
     session = ort.InferenceSession(model_path, providers=[selected_provider])
 
