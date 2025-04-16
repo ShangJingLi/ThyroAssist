@@ -14,7 +14,8 @@ targets = [
     "nested_unet.onnx",
     "medical_resnet.om",
     "medical_resnet.onnx",
-    "trt_cache"
+    "trt_cache",
+    "svm_models"
 ]
 
 flag = False  # 记录是否删除了任何内容
