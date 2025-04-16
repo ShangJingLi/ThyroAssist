@@ -155,7 +155,7 @@ brew install git
 输入如下命令：
 
 ```
-git clone https://github.com/ShangJingLi/ThyroAssist.git
+git clone https://gitee.com/lishangjing2024/ThyroAssist.git
 cd ThyroAssist
 conda activate myenv  # "myenv"是希望安装本项目的环境
 pip install .
@@ -164,7 +164,7 @@ pip install .
 以上命令也可简化为：
 ```
 conda activate myenv
-pip install git+https://github.com/ShangJingLi/ThyroAssist.git
+pip install git+https://gitee.com/lishangjing2024/ThyroAssist.git
 ```
 
 
