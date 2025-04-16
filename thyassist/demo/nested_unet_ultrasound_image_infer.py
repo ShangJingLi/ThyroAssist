@@ -152,9 +152,9 @@ else:
         has_cache = any(fname.endswith('.engine') for fname in os.listdir(cache_dir))
 
         if not has_cache:
-            print(f"🛠️ 检测到首次使用模型 nested_unet.onnx，正在构建 TensorRT 引擎缓存...")
+            print("🛠️ 检测到首次使用模型 nested_unet.onnx，正在构建 TensorRT 引擎缓存...")
         else:
-            print(f"✅ 已检测到模型 nested_unet.onnx 的 TensorRT 缓存，将直接加载。")
+            print("✅ 已检测到模型 nested_unet.onnx 的 TensorRT 缓存，将直接加载。")
 
     session = ort.InferenceSession(model_path, providers=[selected_provider])
 
