@@ -1,3 +1,4 @@
+"""ResNet152网络"""
 import math
 import numpy as np
 from scipy.stats import truncnorm

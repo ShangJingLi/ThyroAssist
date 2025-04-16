@@ -1,3 +1,4 @@
+"""多层感知机数据加载模块"""
 import numpy as np
 import pandas as pd
 from mindspore import dataset as ds

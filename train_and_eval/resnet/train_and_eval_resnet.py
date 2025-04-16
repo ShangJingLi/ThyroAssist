@@ -1,3 +1,4 @@
+"""ResNet152训练脚本"""
 import os
 import subprocess
 import numpy as np

@@ -1,3 +1,4 @@
+"""获取ResNet152配置"""
 import os
 import ast
 import argparse

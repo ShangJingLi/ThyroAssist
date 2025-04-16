@@ -1,3 +1,4 @@
+"""支持向量机数据下载及加载模块"""
 import os
 import zipfile
 import joblib

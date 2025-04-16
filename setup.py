@@ -1,3 +1,4 @@
+"""打包脚本"""
 from setuptools import setup, find_packages
 
 

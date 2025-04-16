@@ -1,3 +1,4 @@
+"""生成ResNet152训练学习率"""
 import math
 import numpy as np
 

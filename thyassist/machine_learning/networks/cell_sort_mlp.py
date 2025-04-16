@@ -1,3 +1,4 @@
+"""多层感知机"""
 from mindspore import nn
 from thyassist.machine_learning.configuration import MlpModelConfig
 

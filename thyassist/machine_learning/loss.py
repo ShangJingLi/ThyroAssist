@@ -1,3 +1,4 @@
+"""多任务交叉熵损失函数"""
 import mindspore
 from mindspore import nn, ops, Tensor
 from mindspore.nn import LossBase

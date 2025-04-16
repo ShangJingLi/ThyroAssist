@@ -1,4 +1,4 @@
-# launcher.py
+"""项目启动脚本"""
 import argparse
 import subprocess
 import sys

@@ -1,3 +1,4 @@
+"""多层感知机训练脚本"""
 import os
 import subprocess
 import mindspore

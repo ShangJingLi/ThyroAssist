@@ -1,3 +1,4 @@
+"""判断是否实性支持向量机训练脚本"""
 import os
 import cv2
 import numpy as np

@@ -1,10 +1,11 @@
+"""数据清理模块"""
 import shutil
 import os
 from launcher import get_project_root
 
 
 project_dir = get_project_root()
-targets = [  # 改为更通用的名称 targets
+targets = [
     "medical_resnet_checkpoints(pad)",
     "nested_unet_checkpoints",
     "best_mlp_checkpoints",
@@ -12,7 +13,8 @@ targets = [  # 改为更通用的名称 targets
     "nested_unet.om",
     "nested_unet.onnx",
     "medical_resnet.om",
-    "medical_resnet.onnx"
+    "medical_resnet.onnx",
+    "trt_cache"
 ]
 
 flag = False  # 记录是否删除了任何内容
@@ -20,6 +22,7 @@ flag = False  # 记录是否删除了任何内容
 for target in targets:
     path = os.path.join(project_dir, target)
 
+    # 对于目录采用递归删除，对于文件采用直接删除
     if os.path.exists(path):
         try:
             if os.path.isdir(path):

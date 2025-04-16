@@ -1,3 +1,4 @@
+"""其他方法"""
 import time
 import subprocess
 import mindspore

@@ -1,3 +1,4 @@
+"""判断是否微钙化支持向量机训练脚本"""
 import os
 import cv2
 import numpy as np

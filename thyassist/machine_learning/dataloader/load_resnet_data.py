@@ -1,3 +1,4 @@
+"""ResNet152数据加载模块"""
 import os
 import warnings
 import multiprocess
