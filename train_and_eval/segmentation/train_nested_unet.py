@@ -1,4 +1,5 @@
 """UNet++训练脚本"""
+import onnxruntime  # pylint: disable=unused-import 规避动态链接库异常
 import os
 import subprocess
 import time
@@ -8,7 +9,6 @@ from mindspore import nn
 from mindspore import Model
 from mindspore import context
 from mindspore.train.callback import LossMonitor
-import onnxruntime  # pylint: disable=unused-import 规避动态链接库异常
 from thyassist.machine_learning.loss import MultiCrossEntropyWithLogits
 from thyassist.machine_learning.dataloader import create_segmentation_dataset_at_numpy, download_and_unzip_segmentation_datasets
 from thyassist.machine_learning.networks import NestedUNet

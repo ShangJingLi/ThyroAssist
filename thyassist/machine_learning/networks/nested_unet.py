@@ -19,16 +19,17 @@ class ChannelAttention(nn.Cell):
 
     def __init__(self, in_planes, k, ratio=16):
         super(ChannelAttention, self).__init__()
-        self.avg_pool = nn.AvgPool2d(kernel_size=k, stride=k)
-        self.max_pool = nn.MaxPool2d(kernel_size=k, stride=k)
         self.fc1 = nn.Conv2d(in_planes, in_planes // ratio, 1, bias_init="zeros")
         self.relu1 = nn.ReLU()
         self.fc2 = nn.Conv2d(in_planes // ratio, in_planes, 1, bias_init="zeros")
         self.sigmoid = nn.Sigmoid()
+        self.reduce_mean = ops.ReduceMean(keep_dims=True)
+        self.reduce_max = ops.ReduceMax(keep_dims=True)
+
 
     def construct(self, x):
-        avg_out = self.fc2(self.relu1(self.fc1(self.avg_pool(x))))
-        max_out = self.fc2(self.relu1(self.fc1(self.max_pool(x))))
+        avg_out = self.fc2(self.relu1(self.fc1(self.reduce_mean(x, axis=(-1, -2)))))
+        max_out = self.fc2(self.relu1(self.fc1(self.reduce_max(x, axis=(-1, -2)))))
         out = avg_out + max_out
         return self.sigmoid(out)
 
